@@ -1,0 +1,10 @@
+main: me.goodgamer123.TriplexCraftNation.MainClass
+api-version: 1.17
+name: TriplexCraftNations
+author: goodgamer123
+description: The TriplexCraft Nations plugin.
+version: 1.0
+
+commands:
+  TCN:
+    description: The TriplexCraft Nations command.
