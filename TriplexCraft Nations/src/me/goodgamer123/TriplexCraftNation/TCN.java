@@ -331,15 +331,46 @@ public class TCN implements CommandExecutor {
 					    		    		p.sendMessage(ChatColor.RED + "This player is already allowed to join your nation.");
 			    						} else {
 			    							DataManager.setAllowed(DataManager.getUuid(args[1]), DataManager.getNation(p.getUniqueId()));
-			    							p.sendMessage(ChatColor.GREEN + "Succesfully allowed " + ChatColor.DARK_GREEN + DataManager.getName(args[1]) + ChatColor.GREEN + " to join your nation.");
+			    							p.sendMessage(ChatColor.GREEN + "Succesfully allowed " + ChatColor.DARK_GREEN + DataManager.getName(DataManager.getUuid(args[1]).toString()) + ChatColor.GREEN + " to join your nation.");
 			    						}
 			    					}
 			    				}
 			    			}
 		    			} else {
 		    				p.sendMessage(ChatColor.RED + "§lNot enough rights to do this!");
-	    		    		p.sendMessage(ChatColor.RED + "Only the nation's president and vice-president can allow players.");
+	    		    		p.sendMessage(ChatColor.RED + "Only the nation's president and vice-president can allow and disallow players.");
 		    			}
+	    			} else {
+	    				p.sendMessage(ChatColor.RED + "§lYou cannot do this!");
+    		    		p.sendMessage(ChatColor.RED + "You are not a member of a nation.");
+	    			}
+	    		} else if (args[0].equalsIgnoreCase("disallow")) {
+	    			if (DataManager.hasNation(p.getUniqueId())) {
+		    			if (DataManager.getRole(p.getUniqueId()) >= 3) {
+		    				if (args.length <= 1) {
+			    				p.sendMessage(ChatColor.RED + "§lIncorrect argument!");
+			    	    		p.sendMessage(ChatColor.RED + "Use " + ChatColor.DARK_RED + "/TCN allow <player name>");
+			    			} else {
+			    				if (DataManager.getUuid(args[1]) == null) {
+		    						p.sendMessage(ChatColor.RED + "§lCannot find player!");
+			    		    		p.sendMessage(ChatColor.RED + "The specified player cannot be found.");
+		    					} else {
+		    						if (DataManager.isAllowed(DataManager.getUuid(args[1]), DataManager.getNation(p.getUniqueId()))) {
+		    							List<String> allowed = DataManager.nationsData.getStringList("Nations." + DataManager.getNation(p.getUniqueId()) + ".Allowed");
+		    							allowed.remove(DataManager.getUuid(args[1]).toString());
+		    							DataManager.nationsData.set("Nations." + DataManager.getNation(p.getUniqueId()) + ".Allowed", allowed);
+		    							DataManager.saveFiles();
+		    							p.sendMessage(ChatColor.GREEN + "Succesfully disallowed " + ChatColor.DARK_GREEN + DataManager.getName(DataManager.getUuid(args[1]).toString()) + ChatColor.GREEN + " to join your nation.");
+		    						} else {
+		    							p.sendMessage(ChatColor.RED + "§lCannot find player!");
+				    		    		p.sendMessage(ChatColor.RED + "This player is already not allowed to join your nation.");
+		    						}
+		    					}
+			    			}
+			    		} else {
+			    			p.sendMessage(ChatColor.RED + "§lNot enough rights to do this!");
+	    		    		p.sendMessage(ChatColor.RED + "Only the nation's president and vice-president can allow and disallow players.");
+			    		}
 	    			} else {
 	    				p.sendMessage(ChatColor.RED + "§lYou cannot do this!");
     		    		p.sendMessage(ChatColor.RED + "You are not a member of a nation.");
@@ -527,7 +558,6 @@ public class TCN implements CommandExecutor {
 					    								p.sendMessage(ChatColor.RED + "§lCan't promote this player!");
 								    		    		p.sendMessage(ChatColor.RED + "There are allready 5 counsils.");
 					    							}
-				    								
 				    							} else {
 				    								p.sendMessage(ChatColor.RED + "§lNot enough rights to do this!");
 							    		    		p.sendMessage(ChatColor.RED + "Only the nation's president can demote players.");
@@ -535,6 +565,9 @@ public class TCN implements CommandExecutor {
 				    						} else if (DataManager.getRole(DataManager.getUuid(args[1])) == 4) {
 			    								p.sendMessage(ChatColor.RED + "§lCan't demote this player!");
 					    		    			p.sendMessage(ChatColor.RED + "You need to resign to do this.");
+				    						} else {
+				    							p.sendMessage(ChatColor.RED + "§lCan't demote this player!");
+						    		    		p.sendMessage(ChatColor.RED + "This player allready has the lowest rank.");
 				    						}
 				    					} else {
 				    						p.sendMessage(ChatColor.RED + "§lCan't demote this player!");
@@ -555,10 +588,13 @@ public class TCN implements CommandExecutor {
     		    		p.sendMessage(ChatColor.RED + "You are not a member of a nation.");
 	    			}
 	    		} else if (args[0].equalsIgnoreCase("resign")) {
+	    			String nation = DataManager.getNation(p.getUniqueId());
 	    			if (DataManager.hasNation(p.getUniqueId())) {
 	    				if (DataManager.getRole(p.getUniqueId()) >= 1) {
-	    					DataManager.removePlayer(p.getUniqueId(), DataManager.getNation(p.getUniqueId()));
-	    					DataManager.setMember(p.getUniqueId(), DataManager.getNation(p.getUniqueId()));
+	    					DataManager.removePlayer(p.getUniqueId(), nation);
+	    					if (DataManager.nationsExists(nation)) {
+	    						DataManager.setMember(p.getUniqueId(), DataManager.getNation(p.getUniqueId()));
+	    					}
 	    					p.sendMessage(ChatColor.GREEN + "You have successfully resigned from your position.");
 	    				} else {
 	    					p.sendMessage(ChatColor.RED + "§lYou cannot do this!");

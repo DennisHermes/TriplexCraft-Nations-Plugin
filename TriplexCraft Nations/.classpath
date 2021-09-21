@@ -8,5 +8,7 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="C:/Users/Dhr. Hermes/Desktop/Minecraft server/Spigot/Minecraft 1.17/spigot.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Dhr. Hermes/Desktop/Minecraft server/Spigot/Minecraft 1.17/plugins/EssentialsX-2.18.2.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Dhr. Hermes/Desktop/Minecraft server/Spigot/Minecraft 1.17/plugins/worldguard.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Dhr. Hermes/Desktop/Minecraft server/Spigot/Minecraft 1.17/plugins/worldedit.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -31,8 +31,10 @@ public class DataManager extends JavaPlugin {
 
 	static File nationsDataFile;
 	static File playerDataFile;
+	static File settingsFile;
 	static FileConfiguration nationsData;
 	static FileConfiguration playerData;
+	static FileConfiguration settings;
 	
 	static Plugin MainClass;
 	
@@ -41,12 +43,22 @@ public class DataManager extends JavaPlugin {
 		
 		final File nationsYml = new File(MainClass.getDataFolder() + "/nationsData.yml");
 		final File playerYml = new File(MainClass.getDataFolder() + "/playerData.yml");
+		final File settingsYml = new File(MainClass.getDataFolder() + "/settings.yml");
 		
 		nationsDataFile = new File(MainClass.getDataFolder(), "/nationsData.yml");
 		nationsData = YamlConfiguration.loadConfiguration(nationsDataFile);
 		
 		playerDataFile = new File(MainClass.getDataFolder(), "/playersData.yml");
 		playerData = YamlConfiguration.loadConfiguration(playerDataFile);
+		
+		settingsFile = new File(MainClass.getDataFolder(), "/settings.yml");
+		settings = YamlConfiguration.loadConfiguration(settingsFile);
+		
+		if (!settingsYml.exists()) {
+			settings.set("nationPrice", 1000);
+			settings.set("pricePerBlock", 10);
+			saveFiles();
+		}
 		
 		if (!nationsYml.exists() || !playerYml.exists()) {
 			saveFiles();
@@ -265,21 +277,36 @@ public class DataManager extends JavaPlugin {
 	}
 	
 	static void removePlayer(UUID uuid, String Nation) {
-		if (getRole(uuid) == 1) {
-			List<String> builders = nationsData.getStringList("Nations." + Nation + ".Builders");
-			builders.remove(uuid.toString());
-			nationsData.set("Nations." + Nation + ".Builders", builders);
-		} else if (getRole(uuid) == 2) {
-			List<String> counsils = nationsData.getStringList("Nations." + Nation + ".Counsils");
-			counsils.remove(uuid.toString());
-			nationsData.set("Nations." + Nation + ".Counsils", counsils);
-		} else if (getRole(uuid) == 3) {
-			nationsData.set("Nations." + Nation + ".VicePresident", null);
-		} else if (getRole(uuid) == 4) {
-			if (nationsData.get("Nations." + Nation + ".VicePresident") != null) {
-				setPresident(UUID.fromString(nationsData.getString("Nations." + Nation + ".Vice-President")), Nation);
+		if (getRole(uuid) == 4) {
+			if (DataManager.nationsData.contains("Nations." + Nation + ".VicePresident")) {
+				setPresident(UUID.fromString(nationsData.getString("Nations." + Nation + ".VicePresident")), Nation);
 			} else {
 				nationsData.set("Nations." + Nation, null);
+			}
+		} else {
+			List<String> members = nationsData.getStringList("Nations." + Nation + ".Members");
+			List<String> builders = nationsData.getStringList("Nations." + Nation + ".Builders");
+			List<String> counsils = nationsData.getStringList("Nations." + Nation + ".Counsils");
+			
+			if (members.contains(uuid.toString())) {
+				members.remove(uuid.toString());
+				nationsData.set("Nations." + Nation + ".Members", members);
+			} 
+			
+			if (builders.contains(uuid.toString())) {
+				builders.remove(uuid.toString());
+				nationsData.set("Nations." + Nation + ".Builders", builders);
+			} 
+	
+			if (counsils.contains(uuid.toString())) {
+				counsils.remove(uuid.toString());
+				nationsData.set("Nations." + Nation + ".Counsils", counsils);
+			} 
+	
+			if (nationsData.getString("Nations." + Nation + ".VicePresident") != null) {
+				if (nationsData.getString("Nations." + Nation + ".VicePresident").equals(uuid.toString())) {
+					nationsData.set("Nations." + Nation + ".VicePresident", null);
+				}
 			}
 		}
 		
@@ -329,6 +356,11 @@ public class DataManager extends JavaPlugin {
 		}
 		try {
 			playerData.save(playerDataFile);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			settings.save(settingsFile);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

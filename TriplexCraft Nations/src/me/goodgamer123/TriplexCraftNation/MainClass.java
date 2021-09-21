@@ -11,7 +11,7 @@ public final class MainClass extends JavaPlugin {
 		
 		getServer().getPluginManager().registerEvents(new Prefix(), this);
 		getServer().getPluginManager().registerEvents(new GUIEvents(), this);
-		getServer().getPluginManager().registerEvents(new OnPlayerHit(), this);
+		getServer().getPluginManager().registerEvents(new NationsEvents(), this);
 		getServer().getPluginManager().registerEvents(new OnJoin(), this);
 		
 		DataManager.loadFiles(this);

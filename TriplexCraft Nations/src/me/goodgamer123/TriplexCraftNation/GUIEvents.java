@@ -1,5 +1,6 @@
 package me.goodgamer123.TriplexCraftNation;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +16,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import com.earth2me.essentials.api.Economy;
+import com.earth2me.essentials.api.UserDoesNotExistException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.WorldGuard;
@@ -172,6 +175,21 @@ public class GUIEvents implements Listener {
 	    				}
     				}
     	    	}
+    			
+    			BigDecimal cost = BigDecimal.valueOf((nationSize - 250) * );
+    			
+    			try {
+					if (!Economy.hasEnough(p.getUniqueId(), cost)) {
+						p.sendMessage(ChatColor.RED + "§lYou cannot do this!");
+						p.sendMessage(ChatColor.RED + "You don't have enough money to create a nation.");
+						return;
+					}
+				} catch (Exception e1) {
+					e1.printStackTrace();
+					p.sendMessage(ChatColor.RED + "§lYou cannot do this!");
+					p.sendMessage(ChatColor.RED + "Something went wrong...");
+					return;
+				}
     			
     			//Calculating corners
     			Location cornerLoc1 = new Location(loc.getWorld(), loc.getX() - (nationSize / 2), 0, loc.getZ() - (nationSize / 2));
