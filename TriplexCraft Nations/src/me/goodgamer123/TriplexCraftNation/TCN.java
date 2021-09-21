@@ -3,11 +3,9 @@ package me.goodgamer123.TriplexCraftNation;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -59,9 +57,9 @@ public class TCN implements CommandExecutor {
 		    				} else {
 				    			ItemStack borderItem = new ItemStack(Material.END_PORTAL_FRAME);
 				    			ItemMeta borderMeta = borderItem.getItemMeta();
-				    			borderMeta.setDisplayName(ChatColor.AQUA + "Nation size: " + ChatColor.GOLD + "§l250" + ChatColor.AQUA + " block");
+				    			borderMeta.setDisplayName(ChatColor.AQUA + "Nation name: " + ChatColor.GOLD + "§l" + args[1]);
 				    			List<String> borderLore = new ArrayList<String>();
-				    			borderLore.add(ChatColor.AQUA + "Nation name: " + ChatColor.GOLD + "§l" + args[1]);
+				    			borderLore.add(ChatColor.AQUA + "Nation size: " + ChatColor.GOLD + "§l250" + ChatColor.AQUA + " block");
 				    			borderMeta.setLore(borderLore);
 				    			borderItem.setItemMeta(borderMeta);
 				    			
@@ -139,12 +137,12 @@ public class TCN implements CommandExecutor {
 	    			} else {
 		    			if (DataManager.hasNation(p.getUniqueId())) {
 		    				if (DataManager.getRole(p.getUniqueId()) == 4) {
-		    					if (!DataManager.getUuid(args[1]).equals("NA")) {
+		    					if (DataManager.getUuid(args[1]) != null) {
 		    						if (DataManager.isFinished(DataManager.getNation(p.getUniqueId()))) {
-		    							if (DataManager.hasNation(UUID.fromString(DataManager.getUuid(args[1])))) {
-		    								if (DataManager.getNation(UUID.fromString(DataManager.getUuid(args[1]))).equals(DataManager.getNation(p.getUniqueId()))) {
-		    									DataManager.setBuilder(UUID.fromString(DataManager.getUuid(args[1])), DataManager.getNation(p.getUniqueId()));
-			    								p.sendMessage(ChatColor.DARK_GREEN + DataManager.getName(DataManager.getUuid(args[1])) + ChatColor.GREEN + " has successfully become builder of your nation!");
+		    							if (DataManager.hasNation(DataManager.getUuid(args[1]))) {
+		    								if (DataManager.getNation(DataManager.getUuid(args[1])).equals(DataManager.getNation(p.getUniqueId()))) {
+		    									DataManager.setBuilder(DataManager.getUuid(args[1]), DataManager.getNation(p.getUniqueId()));
+			    								p.sendMessage(ChatColor.DARK_GREEN + DataManager.getName(DataManager.getUuid(args[1]).toString()) + ChatColor.GREEN + " has successfully become builder of your nation!");
 		    								} else {
 		    									p.sendMessage(ChatColor.RED + "§lYou cannot do this!");
 			    		    		    		p.sendMessage(ChatColor.RED + "The player must first become a member of your nation.");
@@ -154,12 +152,12 @@ public class TCN implements CommandExecutor {
 		    		    		    		p.sendMessage(ChatColor.RED + "The player must first become a member of your nation.");
 		    							}
 		    						} else {
-		    							if (DataManager.hasNation(UUID.fromString(DataManager.getUuid(args[1])))) {
-		    								p.sendMessage(ChatColor.RED + "§lYou cannot do this!");
-		    		    		    		p.sendMessage(ChatColor.RED + "This player is already member of another nation.");
+		    							if (!DataManager.hasNation(DataManager.getUuid(args[1]))) {
+		    								DataManager.setBuilder(DataManager.getUuid(args[1]), DataManager.getNation(p.getUniqueId()));
+		    								p.sendMessage(ChatColor.DARK_GREEN + DataManager.getName(DataManager.getUuid(args[1]).toString()) + ChatColor.GREEN + " has successfully become builder of your nation!");
 		    							} else {
-		    								DataManager.setBuilder(UUID.fromString(DataManager.getUuid(args[1])), DataManager.getNation(p.getUniqueId()));
-		    								p.sendMessage(ChatColor.DARK_GREEN + DataManager.getName(DataManager.getUuid(args[1])) + ChatColor.GREEN + " has successfully become builder of your nation!");
+		    								p.sendMessage(ChatColor.RED + "§lYou cannot do this!");
+		    		    		    		p.sendMessage(ChatColor.RED + "The player is allready in another nation.");
 		    							}
 		    						}
 		    					} else {
@@ -176,7 +174,18 @@ public class TCN implements CommandExecutor {
 		    			}
 	    			}
 	    		} else if (args[0].equalsIgnoreCase("finish")) {
-	    			//TODO
+	    			if (DataManager.hasNation(p.getUniqueId())) {
+	    				if (DataManager.getRole(p.getUniqueId()) == 4) {
+	    					DataManager.finishNation(DataManager.getNation(p.getUniqueId()));
+	    					p.sendMessage(ChatColor.GREEN + "Your nation is successfully finished. Other players can now enter.");
+	    				} else {
+	    					p.sendMessage(ChatColor.RED + "§lNot enough rights to do this!");
+	    		    		p.sendMessage(ChatColor.RED + "Only the nation's president can finish the nation.");
+	    				}
+	    			} else {
+	    				p.sendMessage(ChatColor.RED + "§lYou cannot do this!");
+    		    		p.sendMessage(ChatColor.RED + "You are not president of a nation.");
+	    			}
 	    		} else if (args[0].equalsIgnoreCase("list")) {
     				p.sendMessage(ChatColor.AQUA + "List of nations:");
     				String nations = "";
@@ -204,13 +213,14 @@ public class TCN implements CommandExecutor {
 		    			if (DataManager.getRole(p.getUniqueId()) == 4) {
 			    			if (args.length <= 1) {
 			    				p.sendMessage(ChatColor.RED + "§lIncorrect argument!");
-			    	    		p.sendMessage(ChatColor.RED + "Use " + ChatColor.DARK_RED + "/TCN setstatus <public | private>");
+			    	    		p.sendMessage(ChatColor.RED + "Use " + ChatColor.DARK_RED + "/TCN setdescription <description>");
 			    			} else {
 			    				String description = "";
 			    				for(int i = 1; i < args.length; i++) {
 			    					description = description + args[i] + " ";
 			    	    		}
-			    				DataManager.nationsData.set("Nations." + DataManager.getNation(p.getUniqueId()) + ".description", description);
+			    				DataManager.nationsData.set("Nations." + DataManager.getNation(p.getUniqueId()) + ".Description", description);
+			    				DataManager.saveFiles();
 			    				p.sendMessage(ChatColor.GREEN + "Description successfully set to:");
 			    				p.sendMessage(description);
 			    			}
@@ -234,12 +244,14 @@ public class TCN implements CommandExecutor {
 			    						p.sendMessage(ChatColor.RED + "§lYou cannot do this!");
 			        		    		p.sendMessage(ChatColor.RED + "Your nation is already in public state.");
 			    					} else {
-			    						DataManager.nationsData.set("Nations." + DataManager.getNation(p.getUniqueId()) + ".Finished", true);
+			    						DataManager.nationsData.set("Nations." + DataManager.getNation(p.getUniqueId()) + ".Public", true);
+			    						DataManager.saveFiles();
 			    						p.sendMessage(ChatColor.GREEN + "status succesfully changed to " + ChatColor.DARK_GREEN + "public" + ChatColor.GREEN + ".");
 			    					}
 			    				} else if (args[1].equalsIgnoreCase("private")) {
 			    					if (DataManager.isPublic(DataManager.getNation(p.getUniqueId()))) {
-			    						DataManager.nationsData.set("Nations." + DataManager.getNation(p.getUniqueId()) + ".Finished", false);
+			    						DataManager.nationsData.set("Nations." + DataManager.getNation(p.getUniqueId()) + ".Public", false);
+			    						DataManager.saveFiles();
 			    						p.sendMessage(ChatColor.GREEN + "status succesfully changed to " + ChatColor.DARK_GREEN + "private" + ChatColor.GREEN + ".");
 			    					} else {
 			    						p.sendMessage(ChatColor.RED + "§lYou cannot do this!");
@@ -310,16 +322,16 @@ public class TCN implements CommandExecutor {
 			    					p.sendMessage(ChatColor.RED + "§lYou cannot do this!");
 			    		    		p.sendMessage(ChatColor.RED + "Your nation is public to everyone.");
 			    				} else {
-			    					if (DataManager.getUuid(args[1]).equals("NA")) {
+			    					if (DataManager.getUuid(args[1]) == null) {
 			    						p.sendMessage(ChatColor.RED + "§lCannot find player!");
 				    		    		p.sendMessage(ChatColor.RED + "The specified player cannot be found.");
 			    					} else {
-			    						if (DataManager.isAllowed(UUID.fromString(DataManager.getUuid(args[1])), DataManager.getNation(p.getUniqueId()))) {
+			    						if (DataManager.isAllowed(DataManager.getUuid(args[1]), DataManager.getNation(p.getUniqueId()))) {
 			    							p.sendMessage(ChatColor.RED + "§lCannot find player!");
 					    		    		p.sendMessage(ChatColor.RED + "This player is already allowed to join your nation.");
 			    						} else {
-			    							DataManager.setAllowed(UUID.fromString(DataManager.getUuid(args[1])), DataManager.getNation(p.getUniqueId()));
-			    							p.sendMessage(ChatColor.GREEN + "Succesfully allowed " + ChatColor.DARK_GREEN + DataManager.getName(DataManager.getUuid(args[1])) + ChatColor.GREEN + " to join your nation.");
+			    							DataManager.setAllowed(DataManager.getUuid(args[1]), DataManager.getNation(p.getUniqueId()));
+			    							p.sendMessage(ChatColor.GREEN + "Succesfully allowed " + ChatColor.DARK_GREEN + DataManager.getName(args[1]) + ChatColor.GREEN + " to join your nation.");
 			    						}
 			    					}
 			    				}
@@ -373,15 +385,15 @@ public class TCN implements CommandExecutor {
 	    	    		p.sendMessage(ChatColor.RED + "Use " + ChatColor.DARK_RED + "/TCN kick <player name>");
 	    			} else {
 	    				if (DataManager.hasNation(p.getUniqueId())) {
-		    				if (DataManager.getUuid(args[1]).equals("NA")) {
+		    				if (DataManager.getUuid(args[1]) == null) {
 		    					p.sendMessage(ChatColor.RED + "§lCan't kick this player!");
 		    		    		p.sendMessage(ChatColor.RED + "This player is not a member of your nation.");
 		    				} else {
-			    				if (DataManager.playerData.contains(DataManager.getUuid(args[1]))) {
-			    					if (DataManager.getNation(UUID.fromString(DataManager.getUuid(args[1]))).equals(DataManager.getNation(p.getUniqueId()))) {
+			    				if (DataManager.playerData.contains(DataManager.getUuid(args[1]).toString())) {
+			    					if (DataManager.getNation(DataManager.getUuid(args[1])).equals(DataManager.getNation(p.getUniqueId()))) {
 			    						if (DataManager.getRole(p.getUniqueId()) == 4) {
-			    							DataManager.removePlayer(UUID.fromString(DataManager.getUuid(args[1])), DataManager.getNation(p.getUniqueId()));
-			    							p.sendMessage(ChatColor.DARK_GREEN + DataManager.getName(DataManager.getUuid(args[1])) + ChatColor.GREEN + " has been successfully kicked out of the nation!");
+			    							DataManager.removePlayer(DataManager.getUuid(args[1]), DataManager.getNation(p.getUniqueId()));
+			    							p.sendMessage(ChatColor.DARK_GREEN + DataManager.getName(DataManager.getUuid(args[1]).toString()) + ChatColor.GREEN + " has been successfully kicked out of the nation!");
 			    						} else {
 			    							p.sendMessage(ChatColor.RED + "§lNot enough rights to do this!");
 					    		    		p.sendMessage(ChatColor.RED + "Only the nation's president can kick players.");
@@ -423,34 +435,50 @@ public class TCN implements CommandExecutor {
 			    				p.sendMessage(ChatColor.RED + "§lIncorrect argument!");
 			    	    		p.sendMessage(ChatColor.RED + "Use " + ChatColor.DARK_RED + "/TCN promote <player name>");
 			    			} else {
-			    				if (DataManager.getUuid(args[1]).equals("NA")) {
+			    				if (DataManager.getUuid(args[1]) == null) {
 			    					p.sendMessage(ChatColor.RED + "§lCan't promote this player!");
 			    		    		p.sendMessage(ChatColor.RED + "This player is not a member of your nation.");
 			    				} else {
-			    					if (DataManager.getNation(UUID.fromString(DataManager.getUuid(args[1]))).equals(DataManager.getNation(p.getUniqueId()))) {
-			    						if (DataManager.getRole(UUID.fromString(DataManager.getUuid(args[1]))) == 1) {
-			    							p.sendMessage(ChatColor.RED + "§lCan't promote this player!");
-					    		    		p.sendMessage(ChatColor.RED + "This player allready has the highest rank.");
-			    						} else if (DataManager.getRole(UUID.fromString(DataManager.getUuid(args[1]))) == 2) {
-			    							if (DataManager.getRole(p.getUniqueId()) == 4) {
-			    								p.sendMessage(ChatColor.RED + "§lCan't promote this player!");
-					    		    			p.sendMessage(ChatColor.RED + "You need to resign to do this.");
-			    							} else {
-			    								p.sendMessage(ChatColor.RED + "§lNot enough rights to do this!");
-						    		    		p.sendMessage(ChatColor.RED + "Only the nation's president can kick players.");
-			    							}
-			    						} else if (DataManager.getRole(UUID.fromString(DataManager.getUuid(args[1]))) == 3) {
-			    							if (DataManager.getRole(p.getUniqueId()) == 4) {
-			    								p.sendMessage(ChatColor.RED + "§lCan't promote this player!");
-					    		    			p.sendMessage(ChatColor.RED + "You need to resign to do this.");
-			    							} else {
-			    								p.sendMessage(ChatColor.RED + "§lNot enough rights to do this!");
-						    		    		p.sendMessage(ChatColor.RED + "Only the nation's president can kick players.");
-			    							}
-			    						} else if (DataManager.getRole(UUID.fromString(DataManager.getUuid(args[1]))) == 4) {
-			    							DataManager.setCounsil(UUID.fromString(DataManager.getUuid(args[1])), DataManager.getNation(UUID.fromString(DataManager.getUuid(args[1]))));
-			    							p.sendMessage(ChatColor.DARK_GREEN + DataManager.getName(DataManager.getUuid(args[1])) + ChatColor.GREEN + " is successfully promoted.");
-			    						}
+			    					if (DataManager.hasNation(DataManager.getUuid(args[1]))) {
+				    					if (DataManager.getNation(DataManager.getUuid(args[1])).equals(DataManager.getNation(p.getUniqueId()))) {
+				    						if (DataManager.getRole(DataManager.getUuid(args[1])) == 4) {
+				    							p.sendMessage(ChatColor.RED + "§lCan't promote this player!");
+						    		    		p.sendMessage(ChatColor.RED + "This player allready has the highest rank.");
+				    						} else if (DataManager.getRole(DataManager.getUuid(args[1])) == 3) {
+				    							if (DataManager.getRole(p.getUniqueId()) == 4) {
+				    								p.sendMessage(ChatColor.RED + "§lCan't promote this player!");
+						    		    			p.sendMessage(ChatColor.RED + "You need to resign to do this.");
+				    							} else {
+				    								p.sendMessage(ChatColor.RED + "§lNot enough rights to do this!");
+							    		    		p.sendMessage(ChatColor.RED + "Only the nation's president can kick players.");
+				    							}
+				    						} else if (DataManager.getRole(DataManager.getUuid(args[1])) == 2) {
+				    							if (DataManager.getRole(p.getUniqueId()) == 4) {
+				    								if (!DataManager.nationsData.contains("Nations." + DataManager.getNation(DataManager.getUuid(args[1])) + ".VicePresident")) {
+				    									DataManager.setVicePresident(DataManager.getUuid(args[1]), DataManager.getNation(DataManager.getUuid(args[1])));
+				    									p.sendMessage(ChatColor.GREEN + "Succesfully promoted " + ChatColor.DARK_GREEN + DataManager.getName(DataManager.getUuid(args[1]).toString()) + ChatColor.GREEN + " to " + ChatColor.DARK_GREEN + "vice-president" + ChatColor.GREEN + ".");
+				    								} else {
+				    									p.sendMessage(ChatColor.RED + "§lCan't promote this player!");
+								    		    		p.sendMessage(ChatColor.RED + "There allready is a vice-president.");
+				    								}
+				    							} else {
+				    								p.sendMessage(ChatColor.RED + "§lNot enough rights to do this!");
+							    		    		p.sendMessage(ChatColor.RED + "Only the nation's president can kick players.");
+				    							}
+				    						} else if (DataManager.getRole(DataManager.getUuid(args[1])) <= 1) {
+				    							List<String> counsils = DataManager.nationsData.getStringList("Nations." + DataManager.getNation(DataManager.getUuid(args[1])) + ".Counsils");
+				    							if (counsils.size() != 5) {
+				    								DataManager.setCounsil(DataManager.getUuid(args[1]), DataManager.getNation(DataManager.getUuid(args[1])));
+				    								p.sendMessage(ChatColor.GREEN + "Succesfully promoted " + ChatColor.DARK_GREEN + DataManager.getName(DataManager.getUuid(args[1]).toString()) + ChatColor.GREEN + " to " + ChatColor.DARK_GREEN + "counsil" + ChatColor.GREEN + ".");
+				    							} else {
+				    								p.sendMessage(ChatColor.RED + "§lCan't promote this player!");
+							    		    		p.sendMessage(ChatColor.RED + "There are allready 5 counsils.");
+				    							}
+				    						}
+				    					} else {
+				    						p.sendMessage(ChatColor.RED + "§lCan't promote this player!");
+					    		    		p.sendMessage(ChatColor.RED + "This player is not a member of your nation.");
+				    					}
 			    					} else {
 			    						p.sendMessage(ChatColor.RED + "§lCan't promote this player!");
 				    		    		p.sendMessage(ChatColor.RED + "This player is not a member of your nation.");
@@ -472,33 +500,46 @@ public class TCN implements CommandExecutor {
 			    				p.sendMessage(ChatColor.RED + "§lIncorrect argument!");
 			    	    		p.sendMessage(ChatColor.RED + "Use " + ChatColor.DARK_RED + "/TCN demote <player name>");
 			    			} else {
-			    				if (DataManager.getUuid(args[1]).equals("NA")) {
+			    				if (DataManager.getUuid(args[1]) == null) {
 			    					p.sendMessage(ChatColor.RED + "§lCan't promote this player!");
 			    		    		p.sendMessage(ChatColor.RED + "This player is not a member of your nation.");
 			    				} else {
-			    					if (DataManager.getNation(UUID.fromString(DataManager.getUuid(args[1]))).equals(DataManager.getNation(p.getUniqueId()))) {
-			    						if (DataManager.getRole(UUID.fromString(DataManager.getUuid(args[1]))) == 1) {
-			    							
-			    						} else if (DataManager.getRole(UUID.fromString(DataManager.getUuid(args[1]))) == 2) {
-			    							if (DataManager.getRole(p.getUniqueId()) == 4) {
-			    								p.sendMessage(ChatColor.RED + "§lCan't promote this player!");
+			    					if (DataManager.hasNation(DataManager.getUuid(args[1]))) {
+				    					if (DataManager.getNation(DataManager.getUuid(args[1])).equals(DataManager.getNation(p.getUniqueId()))) {
+				    						if (DataManager.getRole(DataManager.getUuid(args[1])) == 1) {
+				    							DataManager.setMember(DataManager.getUuid(args[1]), DataManager.getNation(DataManager.getUuid(args[1])));
+				    							p.sendMessage(ChatColor.GREEN + "Succesfully demoted " + ChatColor.DARK_GREEN + DataManager.getName(DataManager.getUuid(args[1]).toString()) + ChatColor.GREEN + " to " + ChatColor.DARK_GREEN + "member" + ChatColor.GREEN + ".");
+				    						} else if (DataManager.getRole(DataManager.getUuid(args[1])) == 2) {
+				    							if (DataManager.getRole(p.getUniqueId()) == 4) {
+				    								DataManager.setMember(DataManager.getUuid(args[1]), DataManager.getNation(DataManager.getUuid(args[1])));
+					    							p.sendMessage(ChatColor.GREEN + "Succesfully demoted " + ChatColor.DARK_GREEN + DataManager.getName(DataManager.getUuid(args[1]).toString()) + ChatColor.GREEN + " to " + ChatColor.DARK_GREEN + "member" + ChatColor.GREEN + ".");
+				    							} else {
+				    								DataManager.setMember(DataManager.getUuid(args[1]), DataManager.getNation(DataManager.getUuid(args[1])));
+					    							p.sendMessage(ChatColor.GREEN + "Succesfully demoted " + ChatColor.DARK_GREEN + DataManager.getName(DataManager.getUuid(args[1]).toString()) + ChatColor.GREEN + " to " + ChatColor.DARK_GREEN + "member" + ChatColor.GREEN + ".");
+				    							}
+				    						} else if (DataManager.getRole(DataManager.getUuid(args[1])) == 3) {
+				    							if (DataManager.getRole(p.getUniqueId()) == 4) {
+				    								List<String> counsils = DataManager.nationsData.getStringList("Nations." + DataManager.getNation(DataManager.getUuid(args[1])) + ".Counsils");
+					    							if (counsils.size() != 5) {
+					    								DataManager.setCounsil(DataManager.getUuid(args[1]), DataManager.getNation(DataManager.getUuid(args[1])));
+						    							p.sendMessage(ChatColor.GREEN + "Succesfully demoted " + ChatColor.DARK_GREEN + DataManager.getName(DataManager.getUuid(args[1]).toString()) + ChatColor.GREEN + " to " + ChatColor.DARK_GREEN + "counsil" + ChatColor.GREEN + ".");
+					    							} else {
+					    								p.sendMessage(ChatColor.RED + "§lCan't promote this player!");
+								    		    		p.sendMessage(ChatColor.RED + "There are allready 5 counsils.");
+					    							}
+				    								
+				    							} else {
+				    								p.sendMessage(ChatColor.RED + "§lNot enough rights to do this!");
+							    		    		p.sendMessage(ChatColor.RED + "Only the nation's president can demote players.");
+				    							}
+				    						} else if (DataManager.getRole(DataManager.getUuid(args[1])) == 4) {
+			    								p.sendMessage(ChatColor.RED + "§lCan't demote this player!");
 					    		    			p.sendMessage(ChatColor.RED + "You need to resign to do this.");
-			    							} else {
-			    								p.sendMessage(ChatColor.RED + "§lNot enough rights to do this!");
-						    		    		p.sendMessage(ChatColor.RED + "Only the nation's president can kick players.");
-			    							}
-			    						} else if (DataManager.getRole(UUID.fromString(DataManager.getUuid(args[1]))) == 3) {
-			    							if (DataManager.getRole(p.getUniqueId()) == 4) {
-			    								p.sendMessage(ChatColor.RED + "§lCan't promote this player!");
-					    		    			p.sendMessage(ChatColor.RED + "You need to resign to do this.");
-			    							} else {
-			    								p.sendMessage(ChatColor.RED + "§lNot enough rights to do this!");
-						    		    		p.sendMessage(ChatColor.RED + "Only the nation's president can kick players.");
-			    							}
-			    						} else if (DataManager.getRole(UUID.fromString(DataManager.getUuid(args[1]))) == 4) {
-			    							p.sendMessage(ChatColor.RED + "§lCan't demote this player!");
-					    		    		p.sendMessage(ChatColor.RED + "This player allready has the lowest rank.");
-			    						}
+				    						}
+				    					} else {
+				    						p.sendMessage(ChatColor.RED + "§lCan't demote this player!");
+					    		    		p.sendMessage(ChatColor.RED + "This player is not a member of your nation.");
+				    					}
 			    					} else {
 			    						p.sendMessage(ChatColor.RED + "§lCan't demote this player!");
 				    		    		p.sendMessage(ChatColor.RED + "This player is not a member of your nation.");
@@ -762,7 +803,7 @@ public class TCN implements CommandExecutor {
 		    			List<String> donators = DataManager.nationsData.getStringList("Nations." + DataManager.getNation(p.getUniqueId()) + ".Donators");
 		    			String donatorsString = "";
 		    			for (int i = 0; i > donators.size(); i++) {
-		    				donatorsString = donatorsString + donators.get(i) + ", "; 
+		    				donatorsString = donatorsString + donators.get(i) + ", ";
 		    			}
 		    			p.sendMessage(ChatColor.GOLD + "The current donators are:");
 		    			p.sendMessage(ChatColor.AQUA + donatorsString);
@@ -784,9 +825,20 @@ public class TCN implements CommandExecutor {
 		    			closeMeta.setDisplayName(ChatColor.RED + "§lClose");
 		    			close.setItemMeta(closeMeta);
 		    			
-		    			Inventory adminPanel = Bukkit.createInventory(null, 36, ChatColor.AQUA + "§lAdmin Panel");
-		    			//TODO
-		    			adminPanel.setItem(31, close);
+		    			ItemStack standard = new ItemStack(Material.END_PORTAL_FRAME);
+		    			ItemMeta standardMeta = standard.getItemMeta();
+		    			standardMeta.setDisplayName(ChatColor.GOLD + "Standard nation price.");
+		    			standard.setItemMeta(standardMeta);
+		    			
+		    			ItemStack block = new ItemStack(Material.END_PORTAL_FRAME);
+		    			ItemMeta blockMeta = block.getItemMeta();
+		    			blockMeta.setDisplayName(ChatColor.GOLD + "Price per expending 1 block of nation.");
+		    			block.setItemMeta(blockMeta);
+		    			
+		    			Inventory adminPanel = Bukkit.createInventory(null, 27, ChatColor.AQUA + "§lAdmin Panel");
+		    			adminPanel.setItem(12, standard);
+		    			adminPanel.setItem(14, block);
+		    			adminPanel.setItem(22, close);
 		    			
 		    			p.openInventory(adminPanel);
 	    			} else {
@@ -795,7 +847,7 @@ public class TCN implements CommandExecutor {
 	    			}
 	    		} else if (args[0].equalsIgnoreCase("help")) {
 	    			if (args.length <= 1) {
-	    				p.sendMessage(ChatColor.AQUA +  "---=+=---[" + ChatColor.GOLD + "Nations ally help" + ChatColor.AQUA + "]---=+=---");
+	    				p.sendMessage(ChatColor.AQUA +  "---=+=---[" + ChatColor.GOLD + "Nations help" + ChatColor.AQUA + "]---=+=---");
 	    				p.sendMessage(ChatColor.GOLD + "/TCN create " + ChatColor.AQUA + "Create a nation.");
 	    				p.sendMessage(ChatColor.GOLD + "/TCN builder " + ChatColor.AQUA + "Make someone a builder of your nation.");
 	    				p.sendMessage(ChatColor.GOLD + "/TCN finish " + ChatColor.AQUA + "Finish building your nation.");
@@ -805,8 +857,8 @@ public class TCN implements CommandExecutor {
 	    				p.sendMessage(ChatColor.GOLD + "/TCN setstatus " + ChatColor.AQUA + "Set the status of your nation.");
 	    				p.sendMessage(ChatColor.AQUA +  "---=+=---[" + ChatColor.GOLD + "/TCN help 2" + ChatColor.AQUA + "]---=+=---");
 	    			} else {
-	    				if (args[1] == "1") {
-	    					p.sendMessage(ChatColor.AQUA +  "---=+=---[" + ChatColor.GOLD + "Nations ally help" + ChatColor.AQUA + "]---=+=---");
+	    				if (args[1].contains("2")) {
+	    					p.sendMessage(ChatColor.AQUA +  "---=+=---[" + ChatColor.GOLD + "Nations help" + ChatColor.AQUA + "]---=+=---");
 		    				p.sendMessage(ChatColor.GOLD + "/TCN create " + ChatColor.AQUA + "Create a nation.");
 		    				p.sendMessage(ChatColor.GOLD + "/TCN builder " + ChatColor.AQUA + "Make someone a builder of your nation.");
 		    				p.sendMessage(ChatColor.GOLD + "/TCN finish " + ChatColor.AQUA + "Finish building your nation.");
@@ -815,8 +867,8 @@ public class TCN implements CommandExecutor {
 		    				p.sendMessage(ChatColor.GOLD + "/TCN setdescription " + ChatColor.AQUA + "Set the description of your nation.");
 		    				p.sendMessage(ChatColor.GOLD + "/TCN setstatus " + ChatColor.AQUA + "Set the status of your nation.");
 		    				p.sendMessage(ChatColor.AQUA +  "---=+=---[" + ChatColor.GOLD + "/TCN help 2" + ChatColor.AQUA + "]---=+=---");
-	    				} else if (args[1] == "2") {
-	    					p.sendMessage(ChatColor.AQUA +  "---=+=---[" + ChatColor.GOLD + "Nations ally help" + ChatColor.AQUA + "]---=+=---");
+	    				} else if (args[1].contains("2")) {
+	    					p.sendMessage(ChatColor.AQUA +  "---=+=---[" + ChatColor.GOLD + "Nations help" + ChatColor.AQUA + "]---=+=---");
 		    				p.sendMessage(ChatColor.GOLD + "/TCN join " + ChatColor.AQUA + "Join a nation.");
 		    				p.sendMessage(ChatColor.GOLD + "/TCN leave " + ChatColor.AQUA + "Leave your nation.");
 		    				p.sendMessage(ChatColor.GOLD + "/TCN allow " + ChatColor.AQUA + "Allow a player to join.");
@@ -825,8 +877,8 @@ public class TCN implements CommandExecutor {
 		    				p.sendMessage(ChatColor.GOLD + "/TCN accept " + ChatColor.AQUA + "Accepts an invite.");
 		    				p.sendMessage(ChatColor.GOLD + "/TCN promote " + ChatColor.AQUA + "Promote a player in your nation.");
 		    				p.sendMessage(ChatColor.AQUA +  "---=+=---[" + ChatColor.GOLD + "/TCN help 3" + ChatColor.AQUA + "]---=+=---");
-	    				} else if (args[1] == "3") {
-	    					p.sendMessage(ChatColor.AQUA +  "---=+=---[" + ChatColor.GOLD + "Nations ally help" + ChatColor.AQUA + "]---=+=---");
+	    				} else if (args[1].contains("3")) {
+	    					p.sendMessage(ChatColor.AQUA +  "---=+=---[" + ChatColor.GOLD + "Nations help" + ChatColor.AQUA + "]---=+=---");
 		    				p.sendMessage(ChatColor.GOLD + "/TCN demote " + ChatColor.AQUA + "Demote a player in your nation.");
 		    				p.sendMessage(ChatColor.GOLD + "/TCN resign " + ChatColor.AQUA + "Resign from your position.");
 		    				p.sendMessage(ChatColor.GOLD + "/TCN war " + ChatColor.AQUA + "declair war to other nations.");
@@ -835,14 +887,14 @@ public class TCN implements CommandExecutor {
 		    				p.sendMessage(ChatColor.GOLD + "/TCN allies " + ChatColor.AQUA + "get a list of your allies.");
 		    				p.sendMessage(ChatColor.GOLD + "/TCN treasury " + ChatColor.AQUA + "Your nations treasury.");
 		    				p.sendMessage(ChatColor.AQUA +  "---=+=---[" + ChatColor.GOLD + "/TCN help 4" + ChatColor.AQUA + "]---=+=---");
-	    				} else if (args[1] == "4") {
-	    					p.sendMessage(ChatColor.AQUA +  "---=+=---[" + ChatColor.GOLD + "Nations ally help" + ChatColor.AQUA + "]---=+=---");
+	    				} else if (args[1].contains("4")) {
+	    					p.sendMessage(ChatColor.AQUA +  "---=+=---[" + ChatColor.GOLD + "Nations help" + ChatColor.AQUA + "]---=+=---");
 		    				p.sendMessage(ChatColor.GOLD + "/TCN donators " + ChatColor.AQUA + "Shows a list of who donated to your nation.");
 		    				p.sendMessage(ChatColor.GOLD + "/TCN adminpanel " + ChatColor.AQUA + "Admin panel");
 		    				p.sendMessage(ChatColor.GOLD + "/TCN help " + ChatColor.AQUA + "Shows a list of commands.");
 		    				p.sendMessage(ChatColor.AQUA +  "---=+=---[" + ChatColor.GOLD + "/TCN help" + ChatColor.AQUA + "]---=+=---");
 	    				} else {
-	    					p.sendMessage(ChatColor.AQUA +  "---=+=---[" + ChatColor.GOLD + "Nations ally help" + ChatColor.AQUA + "]---=+=---");
+	    					p.sendMessage(ChatColor.AQUA +  "---=+=---[" + ChatColor.GOLD + "Nations help" + ChatColor.AQUA + "]---=+=---");
 		    				p.sendMessage(ChatColor.GOLD + "/TCN create " + ChatColor.AQUA + "Create a nation.");
 		    				p.sendMessage(ChatColor.GOLD + "/TCN builder " + ChatColor.AQUA + "Make someone a builder of your nation.");
 		    				p.sendMessage(ChatColor.GOLD + "/TCN finish " + ChatColor.AQUA + "Finish building your nation.");
@@ -853,134 +905,7 @@ public class TCN implements CommandExecutor {
 		    				p.sendMessage(ChatColor.AQUA +  "---=+=---[" + ChatColor.GOLD + "/TCN help 2" + ChatColor.AQUA + "]---=+=---");
 	    				}
 	    			}
-    			} else if (args[0].equalsIgnoreCase("test")) {
-    				
-	    			p.sendMessage(ChatColor.AQUA + "Creating Nation...");
-	    			
-	    			//Values
-	    			Location loc = p.getLocation().getBlock().getLocation();
-	    			int nationSize = 250;
-	    			String nationName = "name";
-	    			
-	    			Location cornerLoc1 = new Location(loc.getWorld(), loc.getX() - (nationSize / 2), 0, loc.getZ() - (nationSize / 2));
-    				Location cornerLoc2 = new Location(loc.getWorld(), loc.getX() + (nationSize / 2), 0, loc.getZ() + (nationSize / 2));
-	    			
-	    			//Ignored block list
-	    			List<Material> ignoredBlocks = new ArrayList<Material>();
-	    			ignoredBlocks.add(Material.AIR);
-	    			ignoredBlocks.add(Material.BROWN_MUSHROOM_BLOCK);
-	    			ignoredBlocks.add(Material.RED_MUSHROOM_BLOCK);
-	    			ignoredBlocks.add(Material.RED_MUSHROOM);
-	    			ignoredBlocks.add(Material.BROWN_MUSHROOM);
-	    			ignoredBlocks.add(Material.MUSHROOM_STEM);
-	    			ignoredBlocks.add(Material.BIRCH_LOG);
-	    			ignoredBlocks.add(Material.ACACIA_LEAVES);
-	    			ignoredBlocks.add(Material.JUNGLE_LEAVES);
-	    			ignoredBlocks.add(Material.DARK_OAK_LEAVES);
-	    			ignoredBlocks.add(Material.OAK_LEAVES);
-	    			ignoredBlocks.add(Material.SPRUCE_LEAVES);
-	    			ignoredBlocks.add(Material.ACACIA_LOG);
-	    			ignoredBlocks.add(Material.JUNGLE_LOG);
-	    			ignoredBlocks.add(Material.DARK_OAK_LOG);
-	    			ignoredBlocks.add(Material.OAK_LOG);
-	    			ignoredBlocks.add(Material.SPRUCE_LOG);
-	    			ignoredBlocks.add(Material.BIRCH_LOG);
-	    			ignoredBlocks.add(Material.BIRCH_LEAVES);
-	    			
-	    			//Already claimed check
-	    			for (int x = -(nationSize / 2); x < (nationSize / 2); x++) {
-	    				Location loc1 = loc.getWorld().getHighestBlockAt(new Location(loc.getWorld(), loc.getX() - x, 0, loc.getZ() - (nationSize / 2))).getLocation();
-	    				Location loc2 = loc.getWorld().getHighestBlockAt(new Location(loc.getWorld(), loc.getX() - x, 0, loc.getZ() - (nationSize / 2))).getLocation();
-	    				Location loc3 = loc.getWorld().getHighestBlockAt(new Location(loc.getWorld(), loc.getX() - x, 0, loc.getZ() + (nationSize / 2))).getLocation();
-	    				Location loc4 = loc.getWorld().getHighestBlockAt(new Location(loc.getWorld(), loc.getX() - x, 0, loc.getZ() + (nationSize / 2))).getLocation();
-	    				
-	    				while (ignoredBlocks.contains(loc1.getBlock().getType())) loc1.add(0, -1, 0);
-	    				while (ignoredBlocks.contains(loc2.getBlock().getType())) loc2.add(0, -1, 0);
-	    				while (ignoredBlocks.contains(loc3.getBlock().getType())) loc3.add(0, -1, 0);
-	    				while (ignoredBlocks.contains(loc4.getBlock().getType())) loc4.add(0, -1, 0);
-	    				
-	    				loc1.getBlock().setType(Material.RED_WOOL);
-	    				loc2.getBlock().setType(Material.RED_WOOL);
-	    				loc3.getBlock().setType(Material.RED_WOOL);
-	    				loc4.getBlock().setType(Material.RED_WOOL);
-	    	    	}
-	    			for (int z = -(nationSize / 2); z < (nationSize / 2); z++) {
-	    				Location loc1 = loc.getWorld().getHighestBlockAt(new Location(loc.getWorld(), loc.getX() - (nationSize / 2), 0, loc.getZ() - z)).getLocation();
-	    				Location loc2 = loc.getWorld().getHighestBlockAt(new Location(loc.getWorld(), loc.getX() - (nationSize / 2), 0, loc.getZ() - z)).getLocation();
-	    				Location loc3 = loc.getWorld().getHighestBlockAt(new Location(loc.getWorld(), loc.getX() + (nationSize / 2), 0, loc.getZ() - z)).getLocation();
-	    				Location loc4 = loc.getWorld().getHighestBlockAt(new Location(loc.getWorld(), loc.getX() + (nationSize / 2), 0, loc.getZ() - z)).getLocation();
-	    				
-	    				while (ignoredBlocks.contains(loc1.getBlock().getType())) loc1.add(0, -1, 0);
-	    				while (ignoredBlocks.contains(loc2.getBlock().getType())) loc2.add(0, -1, 0);
-	    				while (ignoredBlocks.contains(loc3.getBlock().getType())) loc3.add(0, -1, 0);
-	    				while (ignoredBlocks.contains(loc4.getBlock().getType())) loc4.add(0, -1, 0);
-	    				
-	    				if (loc1.getBlock().getType().equals(Material.RED_WOOL)) {
-	    					for (String s : DataManager.nationsData.getConfigurationSection("Nations").getKeys(false)) {
-	    						Location subCornerLoc1 = DataManager.nationsData.getLocation("Nations." + s + ".Location.Corner 1");
-	    						Location subCornerLoc2 = DataManager.nationsData.getLocation("Nations." + s + ".Location.Corner 2");
-	    						
-	    						double x1 = subCornerLoc1.getX();
-	    				        double z1 = subCornerLoc1.getZ();
-	    				       
-	    				        double x2 = subCornerLoc2.getX();
-	    				        double z2 = subCornerLoc2.getZ();
-	    						
-	    						if ((loc.getX() > x1) && (loc.getZ() > z1) && (loc.getX() < x2) && (loc.getZ() < z2)) {
-	    							p.sendMessage(ChatColor.RED + "§lYou cannot do this!");
-	    	    		    		p.sendMessage(ChatColor.RED + "There is allready a other nation here.");
-	    							return false;
-	    						}
-	    	    	        }
-	    				}
-	    	    	}
-	    			
-	    			//Data files
-	    			DataManager.setPresident(p.getUniqueId(), nationName);
-	    			DataManager.nationsData.set("Nations." + nationName + ".Finished", false);
-	    			DataManager.nationsData.set("Nations." + nationName + ".Location.Corner 1", cornerLoc1);
-	    			DataManager.nationsData.set("Nations." + nationName + ".Location.Corner 2", cornerLoc2);
-	    			DataManager.nationsData.set("Nations." + nationName + ".Location.Center", loc);
-	    			DataManager.saveFiles();
-	    			
-	    			//Border drawing
-	    			for (int x = -(nationSize / 2); x < (nationSize / 2); x++) {
-	    				Location loc1 = loc.getWorld().getHighestBlockAt(new Location(loc.getWorld(), loc.getX() - x, 0, loc.getZ() - (nationSize / 2))).getLocation();
-	    				Location loc2 = loc.getWorld().getHighestBlockAt(new Location(loc.getWorld(), loc.getX() - x, 0, loc.getZ() - (nationSize / 2))).getLocation();
-	    				Location loc3 = loc.getWorld().getHighestBlockAt(new Location(loc.getWorld(), loc.getX() - x, 0, loc.getZ() + (nationSize / 2))).getLocation();
-	    				Location loc4 = loc.getWorld().getHighestBlockAt(new Location(loc.getWorld(), loc.getX() - x, 0, loc.getZ() + (nationSize / 2))).getLocation();
-	    				
-	    				while (ignoredBlocks.contains(loc1.getBlock().getType())) loc1.add(0, -1, 0);
-	    				while (ignoredBlocks.contains(loc2.getBlock().getType())) loc2.add(0, -1, 0);
-	    				while (ignoredBlocks.contains(loc3.getBlock().getType())) loc3.add(0, -1, 0);
-	    				while (ignoredBlocks.contains(loc4.getBlock().getType())) loc4.add(0, -1, 0);
-	    				
-	    				loc1.getBlock().setType(Material.RED_WOOL);
-	    				loc2.getBlock().setType(Material.RED_WOOL);
-	    				loc3.getBlock().setType(Material.RED_WOOL);
-	    				loc4.getBlock().setType(Material.RED_WOOL);
-	    	    	}
-	    	    	for (int z = -(nationSize / 2); z < (nationSize / 2); z++) {
-	    				Location loc1 = loc.getWorld().getHighestBlockAt(new Location(loc.getWorld(), loc.getX() - (nationSize / 2), 0, loc.getZ() - z)).getLocation();
-	    				Location loc2 = loc.getWorld().getHighestBlockAt(new Location(loc.getWorld(), loc.getX() - (nationSize / 2), 0, loc.getZ() - z)).getLocation();
-	    				Location loc3 = loc.getWorld().getHighestBlockAt(new Location(loc.getWorld(), loc.getX() + (nationSize / 2), 0, loc.getZ() - z)).getLocation();
-	    				Location loc4 = loc.getWorld().getHighestBlockAt(new Location(loc.getWorld(), loc.getX() + (nationSize / 2), 0, loc.getZ() - z)).getLocation();
-	    				
-	    				while (ignoredBlocks.contains(loc1.getBlock().getType())) loc1.add(0, -1, 0);
-	    				while (ignoredBlocks.contains(loc2.getBlock().getType())) loc2.add(0, -1, 0);
-	    				while (ignoredBlocks.contains(loc3.getBlock().getType())) loc3.add(0, -1, 0);
-	    				while (ignoredBlocks.contains(loc4.getBlock().getType())) loc4.add(0, -1, 0);
-	    				
-	    				loc1.getBlock().setType(Material.RED_WOOL);
-	    				loc2.getBlock().setType(Material.RED_WOOL);
-	    				loc3.getBlock().setType(Material.RED_WOOL);
-	    				loc4.getBlock().setType(Material.RED_WOOL);
-	    	    	}
-	    	    	
-	    	    	//echo
-	    			p.sendMessage(ChatColor.GREEN + "Your nation " + nationName + ChatColor.GREEN + " has been successfully created!");
-	    			
-	    		} else {
+    			} else {
 	    			p.sendMessage(ChatColor.RED + "§lIncorrect argument!");
 		    		p.sendMessage(ChatColor.RED + "Use " + ChatColor.DARK_RED + "/TCN help" + ChatColor.RED + " to get a list of the commands you can use!");
 	    		}
