@@ -17,7 +17,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.earth2me.essentials.api.Economy;
-import com.earth2me.essentials.api.UserDoesNotExistException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.WorldGuard;
@@ -37,7 +36,156 @@ public class GUIEvents implements Listener {
 	
 		Player p = (Player) e.getWhoClicked();
 		
-		if (e.getView().getTitle().startsWith(ChatColor.AQUA + "Nation size: ")) {
+		if (e.getView().getTitle().equals(ChatColor.AQUA + "§lAdmin Panel")) {
+			if (e.getSlot() > e.getView().getTopInventory().getSize()) return;
+			
+			if (e.getCurrentItem().getType().equals(Material.BARRIER) && e.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.RED + "§lClose")) {
+				e.setCancelled(true);
+				p.updateInventory();
+				p.closeInventory();
+			} else if (e.getCurrentItem().getType().equals(Material.END_PORTAL_FRAME) && e.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.GOLD + "Standard nation price.")) {
+				e.setCancelled(true);
+				p.openInventory(priceInv("nationPrice"));
+			} else if (e.getCurrentItem().getType().equals(Material.GRASS_BLOCK) && e.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.GOLD + "Price per expending 1 block of nation.")) {
+				e.setCancelled(true);
+				p.openInventory(priceInv("blockPrice"));
+			} else if (e.getCurrentItem().getType().equals(Material.IRON_SWORD) && e.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.GOLD + "Price to start a war.")) {
+				e.setCancelled(true);
+				p.openInventory(priceInv("warPrice"));
+			}
+			
+			
+			
+		} else if (e.getView().getTitle().equals(ChatColor.AQUA + "Price to create a nation.")) {
+			if (e.getCurrentItem().getType().equals(Material.MEDIUM_AMETHYST_BUD) && e.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Add 1")) {
+				e.setCancelled(true);
+				p.updateInventory();
+				DataManager.setNationPrice(DataManager.getNationPrice() + 1);
+				DataManager.saveFiles();
+				p.openInventory(priceInv("nationPrice"));
+			} else if (e.getCurrentItem().getType().equals(Material.LARGE_AMETHYST_BUD) && e.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Add 10")) {
+				e.setCancelled(true);
+				p.updateInventory();
+				DataManager.setNationPrice(DataManager.getNationPrice() + 10);
+				DataManager.saveFiles();
+				p.openInventory(priceInv("nationPrice"));
+			} else if (e.getCurrentItem().getType().equals(Material.AMETHYST_CLUSTER) && e.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Add 50")) {
+				e.setCancelled(true);
+				p.updateInventory();
+				DataManager.setNationPrice(DataManager.getNationPrice() + 50);
+				DataManager.saveFiles();
+				p.openInventory(priceInv("nationPrice"));
+			} else if (e.getCurrentItem().getType().equals(Material.MEDIUM_AMETHYST_BUD) && e.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.RED + "Remove 1")) {
+				e.setCancelled(true);
+				p.updateInventory();
+				DataManager.setNationPrice(DataManager.getNationPrice() - 1);
+				DataManager.saveFiles();
+				p.openInventory(priceInv("nationPrice"));
+			} else if (e.getCurrentItem().getType().equals(Material.LARGE_AMETHYST_BUD) && e.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.RED + "Remove 10")) {
+				e.setCancelled(true);
+				p.updateInventory();
+				DataManager.setNationPrice(DataManager.getNationPrice() - 10);
+				DataManager.saveFiles();
+				p.openInventory(priceInv("nationPrice"));
+			} else if (e.getCurrentItem().getType().equals(Material.AMETHYST_CLUSTER) && e.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.RED + "Remove 50")) {
+				e.setCancelled(true);
+				p.updateInventory();
+				DataManager.setNationPrice(DataManager.getNationPrice() - 50);
+				DataManager.saveFiles();
+				p.openInventory(priceInv("nationPrice"));
+			} else if (e.getCurrentItem().getType().equals(Material.BARRIER) && e.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.RED + "§lCancel")) {
+				e.setCancelled(true);
+				p.updateInventory();
+				p.closeInventory();
+			}
+		} else if (e.getView().getTitle().equals(ChatColor.AQUA + "Price per extra block for a nation.")) {
+			if (e.getCurrentItem().getType().equals(Material.MEDIUM_AMETHYST_BUD) && e.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Add 1")) {
+				e.setCancelled(true);
+				p.updateInventory();
+				DataManager.setPricePerBlock(DataManager.getPricePerBlock() + 1);
+				DataManager.saveFiles();
+				p.openInventory(priceInv("blockPrice"));
+			} else if (e.getCurrentItem().getType().equals(Material.LARGE_AMETHYST_BUD) && e.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Add 10")) {
+				e.setCancelled(true);
+				p.updateInventory();
+				DataManager.setPricePerBlock(DataManager.getPricePerBlock() + 10);
+				DataManager.saveFiles();
+				p.openInventory(priceInv("blockPrice"));
+			} else if (e.getCurrentItem().getType().equals(Material.AMETHYST_CLUSTER) && e.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Add 50")) {
+				e.setCancelled(true);
+				p.updateInventory();
+				DataManager.setPricePerBlock(DataManager.getPricePerBlock() + 50);
+				DataManager.saveFiles();
+				p.openInventory(priceInv("blockPrice"));
+			} else if (e.getCurrentItem().getType().equals(Material.MEDIUM_AMETHYST_BUD) && e.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.RED + "Remove 1")) {
+				e.setCancelled(true);
+				p.updateInventory();
+				DataManager.setPricePerBlock(DataManager.getPricePerBlock() - 1);
+				DataManager.saveFiles();
+				p.openInventory(priceInv("blockPrice"));
+			} else if (e.getCurrentItem().getType().equals(Material.LARGE_AMETHYST_BUD) && e.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.RED + "Remove 10")) {
+				e.setCancelled(true);
+				p.updateInventory();
+				DataManager.setPricePerBlock(DataManager.getPricePerBlock() - 10);
+				DataManager.saveFiles();
+				p.openInventory(priceInv("blockPrice"));
+			} else if (e.getCurrentItem().getType().equals(Material.AMETHYST_CLUSTER) && e.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.RED + "Remove 50")) {
+				e.setCancelled(true);
+				p.updateInventory();
+				DataManager.setPricePerBlock(DataManager.getPricePerBlock() - 50);
+				DataManager.saveFiles();
+				p.openInventory(priceInv("blockPrice"));
+			} else if (e.getCurrentItem().getType().equals(Material.BARRIER) && e.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.RED + "§lCancel")) {
+				e.setCancelled(true);
+				p.updateInventory();
+				p.closeInventory();
+			}
+		} else if (e.getView().getTitle().equals(ChatColor.AQUA + "Price to start a war.")) {
+			if (e.getCurrentItem().getType().equals(Material.MEDIUM_AMETHYST_BUD) && e.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Add 1")) {
+				e.setCancelled(true);
+				p.updateInventory();
+				DataManager.setWarPrice(DataManager.getWarPrice() + 1);
+				DataManager.saveFiles();
+				p.openInventory(priceInv("warPrice"));
+			} else if (e.getCurrentItem().getType().equals(Material.LARGE_AMETHYST_BUD) && e.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Add 10")) {
+				e.setCancelled(true);
+				p.updateInventory();
+				DataManager.setWarPrice(DataManager.getWarPrice() + 10);
+				DataManager.saveFiles();
+				p.openInventory(priceInv("warPrice"));
+			} else if (e.getCurrentItem().getType().equals(Material.AMETHYST_CLUSTER) && e.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Add 50")) {
+				e.setCancelled(true);
+				p.updateInventory();
+				DataManager.setWarPrice(DataManager.getWarPrice() + 50);
+				DataManager.saveFiles();
+				p.openInventory(priceInv("warPrice"));
+			} else if (e.getCurrentItem().getType().equals(Material.MEDIUM_AMETHYST_BUD) && e.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.RED + "Remove 1")) {
+				e.setCancelled(true);
+				p.updateInventory();
+				DataManager.setWarPrice(DataManager.getWarPrice() - 1);
+				DataManager.saveFiles();
+				p.openInventory(priceInv("warPrice"));
+			} else if (e.getCurrentItem().getType().equals(Material.LARGE_AMETHYST_BUD) && e.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.RED + "Remove 10")) {
+				e.setCancelled(true);
+				p.updateInventory();
+				DataManager.setWarPrice(DataManager.getWarPrice() - 10);
+				DataManager.saveFiles();
+				p.openInventory(priceInv("warPrice"));
+			} else if (e.getCurrentItem().getType().equals(Material.AMETHYST_CLUSTER) && e.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.RED + "Remove 50")) {
+				e.setCancelled(true);
+				p.updateInventory();
+				DataManager.setWarPrice(DataManager.getWarPrice() - 50);
+				DataManager.saveFiles();
+				p.openInventory(priceInv("warPrice"));
+			} else if (e.getCurrentItem().getType().equals(Material.BARRIER) && e.getCurrentItem().getItemMeta().getDisplayName().equals(ChatColor.RED + "§lCancel")) {
+				e.setCancelled(true);
+				p.updateInventory();
+				p.closeInventory();
+			}
+			
+			
+			
+		} else if (e.getView().getTitle().startsWith(ChatColor.AQUA + "Nation size: ")) {
 			if (e.getSlot() > e.getView().getTopInventory().getSize()) return;
 			
 			if (e.getCurrentItem().getType().equals(Material.END_PORTAL_FRAME) && e.getCurrentItem().getItemMeta().getDisplayName().startsWith(ChatColor.AQUA + "Nation size: ")) {
@@ -176,7 +324,7 @@ public class GUIEvents implements Listener {
     				}
     	    	}
     			
-    			BigDecimal cost = BigDecimal.valueOf((nationSize - 250) * );
+    			BigDecimal cost = BigDecimal.valueOf((nationSize - 250) * DataManager.getPricePerBlock() + DataManager.getNationPrice());
     			
     			try {
 					if (!Economy.hasEnough(p.getUniqueId(), cost)) {
@@ -184,6 +332,15 @@ public class GUIEvents implements Listener {
 						p.sendMessage(ChatColor.RED + "You don't have enough money to create a nation.");
 						return;
 					}
+				} catch (Exception e1) {
+					e1.printStackTrace();
+					p.sendMessage(ChatColor.RED + "§lYou cannot do this!");
+					p.sendMessage(ChatColor.RED + "Something went wrong...");
+					return;
+				}
+    			
+    			try {
+					Economy.subtract(p.getUniqueId(), cost);
 				} catch (Exception e1) {
 					e1.printStackTrace();
 					p.sendMessage(ChatColor.RED + "§lYou cannot do this!");
@@ -281,6 +438,79 @@ public class GUIEvents implements Listener {
 		borderSize.setItem(32, inv.getItem(32));
 		
 		return borderSize;
+	}
+	
+	Inventory priceInv(String type) {
+		ItemStack borderItem = new ItemStack(Material.END_PORTAL_FRAME);
+		ItemMeta borderMeta = borderItem.getItemMeta();
+		if (type.equals("nationPrice")) {
+			borderMeta.setDisplayName(ChatColor.AQUA + "Nation price: " + ChatColor.GOLD + "§l" + DataManager.getNationPrice());
+		} else if (type.equals("blockPrice")) {
+			borderMeta.setDisplayName(ChatColor.AQUA + "Block price: " + ChatColor.GOLD + "§l" + DataManager.getPricePerBlock());
+		} else if (type.equals("warPrice")) {
+			borderMeta.setDisplayName(ChatColor.AQUA + "War price: " + ChatColor.GOLD + "§l" + DataManager.getWarPrice());
+		}
+		List<String> borderLore = new ArrayList<String>();
+		borderMeta.setLore(borderLore);
+		borderItem.setItemMeta(borderMeta);
+		
+		ItemStack plus1 = new ItemStack(Material.MEDIUM_AMETHYST_BUD);
+		ItemMeta plus1Meta = plus1.getItemMeta();
+		plus1Meta.setDisplayName(ChatColor.GREEN + "Add 1");
+		plus1.setItemMeta(plus1Meta);
+		
+		ItemStack plus10 = new ItemStack(Material.LARGE_AMETHYST_BUD);
+		plus10.setAmount(10);
+		ItemMeta plus10Meta = plus10.getItemMeta();
+		plus10Meta.setDisplayName(ChatColor.GREEN + "Add 10");
+		plus10.setItemMeta(plus10Meta);
+		
+		ItemStack plus50 = new ItemStack(Material.AMETHYST_CLUSTER);
+		plus50.setAmount(50);
+		ItemMeta plus50Meta = plus50.getItemMeta();
+		plus50Meta.setDisplayName(ChatColor.GREEN + "Add 50");
+		plus50.setItemMeta(plus50Meta);
+		
+		ItemStack min1 = new ItemStack(Material.MEDIUM_AMETHYST_BUD);
+		ItemMeta min1Meta = min1.getItemMeta();
+		min1Meta.setDisplayName(ChatColor.RED + "Remove 1");
+		min1.setItemMeta(min1Meta);
+		
+		ItemStack min10 = new ItemStack(Material.LARGE_AMETHYST_BUD);
+		min10.setAmount(10);
+		ItemMeta min10Meta = min10.getItemMeta();
+		min10Meta.setDisplayName(ChatColor.RED + "Remove 10");
+		min10.setItemMeta(min10Meta);
+		
+		ItemStack min50 = new ItemStack(Material.AMETHYST_CLUSTER);
+		min50.setAmount(50);
+		ItemMeta min50Meta = min50.getItemMeta();
+		min50Meta.setDisplayName(ChatColor.RED + "Remove 50");
+		min50.setItemMeta(min50Meta);
+		
+		ItemStack cancel = new ItemStack(Material.BARRIER);
+		ItemMeta cancelMeta = cancel.getItemMeta();
+		cancelMeta.setDisplayName(ChatColor.RED + "§lCancel");
+		cancel.setItemMeta(cancelMeta);
+		
+		Inventory inv = null;
+		if (type.equals("nationPrice")) {
+			inv = Bukkit.createInventory(null, 36, ChatColor.AQUA + "Price to create a nation.");
+		} else if (type.equals("blockPrice")) {
+			inv = Bukkit.createInventory(null, 36, ChatColor.AQUA + "Price per extra block for a nation.");
+		} else if (type.equals("warPrice")) {
+			inv = Bukkit.createInventory(null, 36, ChatColor.AQUA + "Price to start a war.");
+		}
+		inv.setItem(9, min50);
+		inv.setItem(10, min10);
+		inv.setItem(11, min1);
+		inv.setItem(13, borderItem);
+		inv.setItem(15, plus1);
+		inv.setItem(16, plus10);
+		inv.setItem(17, plus50);
+		inv.setItem(31, cancel);
+		
+		return inv;
 	}
 	
 }

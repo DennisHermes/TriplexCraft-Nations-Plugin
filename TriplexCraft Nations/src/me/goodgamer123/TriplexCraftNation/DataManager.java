@@ -55,8 +55,9 @@ public class DataManager extends JavaPlugin {
 		settings = YamlConfiguration.loadConfiguration(settingsFile);
 		
 		if (!settingsYml.exists()) {
-			settings.set("nationPrice", 1000);
+			settings.set("nationPrice", 10000);
 			settings.set("pricePerBlock", 10);
+			settings.set("warPrice", 1000);
 			saveFiles();
 		}
 		
@@ -65,8 +66,28 @@ public class DataManager extends JavaPlugin {
 		}
 	}
 	
-	static double getMinimumForWar() {
-		return 0.00;
+	static int getPricePerBlock() {
+		return DataManager.settings.getInt("pricePerBlock");
+	}
+	
+	static int getNationPrice() {
+		return DataManager.settings.getInt("nationPrice");
+	}
+	
+	static int getWarPrice() {
+		return DataManager.settings.getInt("warPrice");
+	}
+	
+	static void setPricePerBlock(int price) {
+		if (getPricePerBlock() <= price) DataManager.settings.set("pricePerBlock", price);
+	}
+	
+	static void setNationPrice(int price) {
+		if (getNationPrice() <= price) DataManager.settings.set("nationPrice", price);
+	}
+	
+	static void setWarPrice(int price) {
+		if (getWarPrice() <= price) DataManager.settings.set("warPrice", price);
 	}
 	
 	static boolean hasNation(UUID uuid) {
@@ -262,6 +283,20 @@ public class DataManager extends JavaPlugin {
 		saveFiles();
 	}
 	
+	static void endWar(String Nation1, String Nation2) {
+		List<String> enemies = nationsData.getStringList("Nations." + Nation1 + ".Enemies");
+		enemies.remove(Nation2);
+		
+		nationsData.set("Nations." + Nation1 + ".Enemies", enemies);
+		
+		enemies = nationsData.getStringList("Nations." + Nation2 + ".Enemies");
+		enemies.remove(Nation1);
+		
+		nationsData.set("Nations." + Nation2 + ".Enemies", enemies);
+
+		saveFiles();
+	}
+	
 	static void setAlly(String Nation1, String Nation2) {
 		List<String> allys = nationsData.getStringList("Nations." + Nation1 + ".Allys");
 		allys.add(Nation2);
@@ -270,6 +305,20 @@ public class DataManager extends JavaPlugin {
 		
 		allys = nationsData.getStringList("Nations." + Nation2 + ".Allys");
 		allys.add(Nation1);
+		
+		nationsData.set("Nations." + Nation2 + ".Allys", allys);
+
+		saveFiles();
+	}
+	
+	static void endAlly(String Nation1, String Nation2) {
+		List<String> allys = nationsData.getStringList("Nations." + Nation1 + ".Allys");
+		allys.remove(Nation2);
+		
+		nationsData.set("Nations." + Nation1 + ".Allys", allys);
+		
+		allys = nationsData.getStringList("Nations." + Nation2 + ".Allys");
+		allys.remove(Nation1);
 		
 		nationsData.set("Nations." + Nation2 + ".Allys", allys);
 

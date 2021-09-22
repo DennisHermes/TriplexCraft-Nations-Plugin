@@ -3,6 +3,7 @@ package me.goodgamer123.TriplexCraftNation;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -383,7 +384,7 @@ public class TCN implements CommandExecutor {
 		    			if (DataManager.hasNation(p.getUniqueId())) {
 		    				if (DataManager.isPublic(DataManager.getNation(p.getUniqueId()))) {
 		    					if (Bukkit.getOfflinePlayer(args[1]).isOnline()) {
-		    						inviteList.put(Bukkit.getPlayer(args[0]), DataManager.getNation(p.getUniqueId()));
+		    						inviteList.put(Bukkit.getPlayer(args[1]), DataManager.getNation(p.getUniqueId()));
 		    						Bukkit.getPlayer(args[1]).sendMessage(ChatColor.AQUA + "You are invited to the nation " + ChatColor.GOLD + DataManager.getNation(p.getUniqueId()) + ChatColor.AQUA + ". Use " + ChatColor.GOLD + "/TCN accept" + ChatColor.AQUA + " or " + ChatColor.GOLD + "/TCN deny" + ChatColor.AQUA + ".");
 		    						p.sendMessage(ChatColor.GREEN + "Invite succesfully send to " + Bukkit.getPlayer(args[1]).getName());
 		    					} else {
@@ -393,7 +394,7 @@ public class TCN implements CommandExecutor {
 		    				} else {
 		    					if (DataManager.getRole(p.getUniqueId()) >= 3) {
 		    						if (Bukkit.getOfflinePlayer(args[1]).isOnline()) {
-		    							inviteList.put(Bukkit.getPlayer(args[0]), DataManager.getNation(p.getUniqueId()));
+		    							inviteList.put(Bukkit.getPlayer(args[1]), DataManager.getNation(p.getUniqueId()));
 			    						Bukkit.getPlayer(args[1]).sendMessage(ChatColor.AQUA + "You are invited to the nation " + ChatColor.GOLD + DataManager.getNation(p.getUniqueId()) + ChatColor.AQUA + ". Use " + ChatColor.GOLD + "/TCN accept" + ChatColor.AQUA + " or " + ChatColor.GOLD + "/TCN deny" + ChatColor.AQUA + ".");
 			    						p.sendMessage(ChatColor.GREEN + "Invite succesfully send to " + Bukkit.getPlayer(args[1]).getName());
 			    					} else {
@@ -445,7 +446,7 @@ public class TCN implements CommandExecutor {
 	    			}
 	    		} else if (args[0].equalsIgnoreCase("accept")) {
 	    			if (inviteList.containsKey(p)) {
-	    				Bukkit.dispatchCommand(p, "join " + inviteList.get(p));
+	    				Bukkit.dispatchCommand(p, "tcn join " + inviteList.get(p));
 	    				inviteList.remove(p);
 	    			} else {
 	    				p.sendMessage(ChatColor.RED + "§lYou cannot do this!");
@@ -612,49 +613,65 @@ public class TCN implements CommandExecutor {
 //===========================================//
 	    			
 	    		} else if (args[0].equalsIgnoreCase("war")) {
-	    			if (args.length <= 1) {
-		    			if (DataManager.hasNation(p.getUniqueId())) {
-		    				if (DataManager.getRole(p.getUniqueId()) == 4) {
-				    			if (args.length <= 1) {
-				    				p.sendMessage(ChatColor.RED + "§lIncorrect argument!");
-				    	    		p.sendMessage(ChatColor.RED + "Use " + ChatColor.DARK_RED + "/TCN war <nation name>");
-				    			} else {
-				    	    		if (args[0].equalsIgnoreCase("accept")) {
-						    			if (warList.containsKey(DataManager.getNation(p.getUniqueId()))) {
-						    				DataManager.setWar(DataManager.getNation(p.getUniqueId()), warList.get(DataManager.getNation(p.getUniqueId())));
-						    				warList.remove(DataManager.getNation(p.getUniqueId()));
-						    				p.sendMessage(ChatColor.GREEN + "War request succesfully accepted.");
-						    			} else {
-						    				p.sendMessage(ChatColor.RED + "§lYou cannot do this!");
-					    		    		p.sendMessage(ChatColor.RED + "You don't have war requests.");
-						    			}
-						    		} else if (args[1].equalsIgnoreCase("deny")) {
-						    			if (warList.containsKey(DataManager.getNation(p.getUniqueId()))) {
-						    				warList.remove(DataManager.getNation(p.getUniqueId()));
-						    				p.sendMessage(ChatColor.GREEN + "War request successfully denied.");
-						    			} else {
-						    				p.sendMessage(ChatColor.RED + "§lYou cannot do this!");
-					    		    		p.sendMessage(ChatColor.RED + "You don't have war requests.");
-						    			}
-						    		} else {
-					    				if (DataManager.nationsExists(args[1])) {
-					    					if (Bukkit.getOfflinePlayer(DataManager.getPresident(args[1])).isOnline()) {
-					    						Bukkit.getPlayer(args[1]).sendMessage(ChatColor.GOLD + DataManager.getNation(p.getUniqueId()) + ChatColor.AQUA + " has declared war. Use " + ChatColor.GOLD + "/TCN war accept" + ChatColor.AQUA + " or " + ChatColor.GOLD + "/TCN war deny" + ChatColor.AQUA + ".");
-					    					}
-					    					warList.put(DataManager.getNation(p.getUniqueId()), args[1]);
-					    				} else {
-					    					p.sendMessage(ChatColor.RED + "§lIncorrect argument!");
-						    	    		p.sendMessage(ChatColor.RED + "Nation does not exist.");
-					    				}
-					    			}
-				    			}
+	    			if (DataManager.hasNation(p.getUniqueId())) {
+	    				if (DataManager.getRole(p.getUniqueId()) == 4) {
+			    			if (args.length <= 1) {
+			    				p.sendMessage(ChatColor.RED + "§lIncorrect argument!");
+			    	    		p.sendMessage(ChatColor.RED + "Use " + ChatColor.DARK_RED + "/TCN war <nation name | accept | deny | end>");
 			    			} else {
-			    				p.sendMessage(ChatColor.RED + "§lYou cannot do this!");
-		    		    		p.sendMessage(ChatColor.RED + "You are not president of your nation.");
+			    	    		if (args[1].equalsIgnoreCase("accept")) {
+					    			if (warList.containsKey(DataManager.getNation(p.getUniqueId()))) {
+					    				DataManager.setWar(DataManager.getNation(p.getUniqueId()), warList.get(DataManager.getNation(p.getUniqueId())));
+					    				warList.remove(DataManager.getNation(p.getUniqueId()));
+					    				p.sendMessage(ChatColor.GREEN + "War request succesfully accepted.");
+					    			} else {
+					    				p.sendMessage(ChatColor.RED + "§lYou cannot do this!");
+				    		    		p.sendMessage(ChatColor.RED + "You don't have war requests.");
+					    			}
+					    		} else if (args[1].equalsIgnoreCase("deny")) {
+					    			if (warList.containsKey(DataManager.getNation(p.getUniqueId()))) {
+					    				warList.remove(DataManager.getNation(p.getUniqueId()));
+					    				p.sendMessage(ChatColor.GREEN + "War request successfully denied.");
+					    			} else {
+					    				p.sendMessage(ChatColor.RED + "§lYou cannot do this!");
+				    		    		p.sendMessage(ChatColor.RED + "You don't have war requests.");
+					    			}
+					    		} else if (args[1].equalsIgnoreCase("end")) {
+					    			if (args.length >= 2) { 
+						    			List<String> enemies = DataManager.nationsData.getStringList("Nations." + DataManager.getNation(p.getUniqueId()) + ".Enemies");
+						    			if (enemies.contains(args[2])) {
+						    				DataManager.endWar(DataManager.getNation(p.getUniqueId()), args[2]);
+						    				p.sendMessage(ChatColor.GREEN + "Succesfully ended the war with " + ChatColor.DARK_GREEN + args[2] + ChatColor.GREEN + ".");
+						    			} else {
+						    				p.sendMessage(ChatColor.RED + "§lYou cannot do this!");
+					    		    		p.sendMessage(ChatColor.RED + "You are not in war with this nation.");
+						    			}
+					    			} else {
+					    				p.sendMessage(ChatColor.RED + "§lIncorrect argument!");
+					    	    		p.sendMessage(ChatColor.RED + "Use " + ChatColor.DARK_RED + "/TCN war end <nation name>");
+					    			}
+					    		} else {
+				    				if (DataManager.nationsExists(args[1])) {
+				    					List<String> enemies = DataManager.nationsData.getStringList("Nations." + DataManager.getNation(p.getUniqueId()) + ".Enemies");
+				    					if (!enemies.contains(args[1])) {
+					    					if (Bukkit.getOfflinePlayer(UUID.fromString(DataManager.getPresident(args[1]))).isOnline()) {
+					    						Bukkit.getPlayer(UUID.fromString(DataManager.getPresident(args[1]))).sendMessage(ChatColor.GOLD + DataManager.getNation(p.getUniqueId()) + ChatColor.AQUA + " has declared war. Use " + ChatColor.GOLD + "/TCN war accept" + ChatColor.AQUA + " or " + ChatColor.GOLD + "/TCN war deny" + ChatColor.AQUA + ".");
+					    					}
+					    					warList.put(DataManager.getNation(UUID.fromString(DataManager.getPresident(args[1]))), DataManager.getNation(p.getUniqueId()));
+					    					p.sendMessage(ChatColor.GREEN + "War request succesfully send to " + ChatColor.DARK_GREEN + args[1]);
+				    					} else {
+				    						p.sendMessage(ChatColor.RED + "§lYou cannot do this!");
+					    		    		p.sendMessage(ChatColor.RED + "You are allready in war with this nation.");
+				    					}
+				    				} else {
+				    					p.sendMessage(ChatColor.RED + "§lIncorrect argument!");
+					    	    		p.sendMessage(ChatColor.RED + "Nation does not exist.");
+				    				}
+				    			}
 			    			}
 		    			} else {
-		    				p.sendMessage(ChatColor.RED + "§lIncorrect argument!");
-		    	    		p.sendMessage(ChatColor.RED + "Use " + ChatColor.DARK_RED + "/TCN war help" + ChatColor.RED + " to get a list of the possibilities of the war command.");
+		    				p.sendMessage(ChatColor.RED + "§lYou cannot do this!");
+	    		    		p.sendMessage(ChatColor.RED + "You are not president of your nation.");
 		    			}
 	    			} else {
 	    				p.sendMessage(ChatColor.RED + "§lYou cannot do this!");
@@ -678,7 +695,7 @@ public class TCN implements CommandExecutor {
 		    			if (DataManager.getRole(p.getUniqueId()) == 4) {
 			    			if (args.length <= 1) {
 			    				p.sendMessage(ChatColor.RED + "§lIncorrect argument!");
-			    	    		p.sendMessage(ChatColor.RED + "Use " + ChatColor.DARK_RED + "/TCN ally <nation name>");
+			    	    		p.sendMessage(ChatColor.RED + "Use " + ChatColor.DARK_RED + "/TCN ally <nation name | accept | deny | end>");
 			    			} else {
 			    	    		if (args[0].equalsIgnoreCase("accept")) {
 					    			if (allyList.containsKey(DataManager.getNation(p.getUniqueId()))) {
@@ -697,12 +714,32 @@ public class TCN implements CommandExecutor {
 					    				p.sendMessage(ChatColor.RED + "§lYou cannot do this!");
 				    		    		p.sendMessage(ChatColor.RED + "You don't have any ally requests.");
 					    			}
+					    		} else if (args[1].equalsIgnoreCase("end")) {
+					    			if (args.length >= 2) { 
+						    			List<String> allys = DataManager.nationsData.getStringList("Nations." + DataManager.getNation(p.getUniqueId()) + ".Allys");
+						    			if (allys.contains(args[2])) {
+						    				DataManager.endAlly(DataManager.getNation(p.getUniqueId()), args[2]);
+						    				p.sendMessage(ChatColor.GREEN + "Succesfully ended the ally with " + ChatColor.DARK_GREEN + args[2] + ChatColor.GREEN + ".");
+						    			} else {
+						    				p.sendMessage(ChatColor.RED + "§lYou cannot do this!");
+					    		    		p.sendMessage(ChatColor.RED + "You are not allies with this nation.");
+						    			}
+					    			} else {
+					    				p.sendMessage(ChatColor.RED + "§lIncorrect argument!");
+					    	    		p.sendMessage(ChatColor.RED + "Use " + ChatColor.DARK_RED + "/TCN ally end <nation name>");
+					    			}
 					    		} else {
 				    				if (DataManager.nationsExists(args[1])) {
-				    					if (Bukkit.getOfflinePlayer(DataManager.getPresident(args[1])).isOnline()) {
-				    						Bukkit.getPlayer(args[1]).sendMessage(ChatColor.GOLD + DataManager.getNation(p.getUniqueId()) + ChatColor.AQUA + " wants to be allies. Use " + ChatColor.GOLD + "/TCN war accept" + ChatColor.AQUA + " or " + ChatColor.GOLD + "/TCN war deny" + ChatColor.AQUA + ".");
+				    					List<String> allys = DataManager.nationsData.getStringList("Nations." + DataManager.getNation(p.getUniqueId()) + ".Allys");
+				    					if (allys.contains(args[1])) {
+					    					if (Bukkit.getOfflinePlayer(UUID.fromString(DataManager.getPresident(args[1]))).isOnline()) {
+					    						Bukkit.getPlayer(args[1]).sendMessage(ChatColor.GOLD + DataManager.getNation(p.getUniqueId()) + ChatColor.AQUA + " wants to be allies. Use " + ChatColor.GOLD + "/TCN war accept" + ChatColor.AQUA + " or " + ChatColor.GOLD + "/TCN war deny" + ChatColor.AQUA + ".");
+					    					}
+					    					allyList.put(DataManager.getNation(p.getUniqueId()), args[1]);
+				    					} else {
+				    						p.sendMessage(ChatColor.RED + "§lYou cannot do this!");
+					    		    		p.sendMessage(ChatColor.RED + "You are allready allies with this nation.");
 				    					}
-				    					allyList.put(DataManager.getNation(p.getUniqueId()), args[1]);
 				    				} else {
 				    					p.sendMessage(ChatColor.RED + "§lIncorrect argument!");
 					    	    		p.sendMessage(ChatColor.RED + "Nation does not exist.");
@@ -866,15 +903,21 @@ public class TCN implements CommandExecutor {
 		    			standardMeta.setDisplayName(ChatColor.GOLD + "Standard nation price.");
 		    			standard.setItemMeta(standardMeta);
 		    			
-		    			ItemStack block = new ItemStack(Material.END_PORTAL_FRAME);
+		    			ItemStack block = new ItemStack(Material.GRASS_BLOCK);
 		    			ItemMeta blockMeta = block.getItemMeta();
 		    			blockMeta.setDisplayName(ChatColor.GOLD + "Price per expending 1 block of nation.");
 		    			block.setItemMeta(blockMeta);
 		    			
-		    			Inventory adminPanel = Bukkit.createInventory(null, 27, ChatColor.AQUA + "§lAdmin Panel");
-		    			adminPanel.setItem(12, standard);
-		    			adminPanel.setItem(14, block);
-		    			adminPanel.setItem(22, close);
+		    			ItemStack war = new ItemStack(Material.IRON_SWORD);
+		    			ItemMeta warMeta = war.getItemMeta();
+		    			warMeta.setDisplayName(ChatColor.GOLD + "Price to start a war.");
+		    			war.setItemMeta(warMeta);
+		    			
+		    			Inventory adminPanel = Bukkit.createInventory(null, 36, ChatColor.AQUA + "§lAdmin Panel");
+		    			adminPanel.setItem(11, standard);
+		    			adminPanel.setItem(13, block);
+		    			adminPanel.setItem(15, war);
+		    			adminPanel.setItem(31, close);
 		    			
 		    			p.openInventory(adminPanel);
 	    			} else {
@@ -893,7 +936,7 @@ public class TCN implements CommandExecutor {
 	    				p.sendMessage(ChatColor.GOLD + "/TCN setstatus " + ChatColor.AQUA + "Set the status of your nation.");
 	    				p.sendMessage(ChatColor.AQUA +  "---=+=---[" + ChatColor.GOLD + "/TCN help 2" + ChatColor.AQUA + "]---=+=---");
 	    			} else {
-	    				if (args[1].contains("2")) {
+	    				if (args[1].contains("1")) {
 	    					p.sendMessage(ChatColor.AQUA +  "---=+=---[" + ChatColor.GOLD + "Nations help" + ChatColor.AQUA + "]---=+=---");
 		    				p.sendMessage(ChatColor.GOLD + "/TCN create " + ChatColor.AQUA + "Create a nation.");
 		    				p.sendMessage(ChatColor.GOLD + "/TCN builder " + ChatColor.AQUA + "Make someone a builder of your nation.");
@@ -908,10 +951,10 @@ public class TCN implements CommandExecutor {
 		    				p.sendMessage(ChatColor.GOLD + "/TCN join " + ChatColor.AQUA + "Join a nation.");
 		    				p.sendMessage(ChatColor.GOLD + "/TCN leave " + ChatColor.AQUA + "Leave your nation.");
 		    				p.sendMessage(ChatColor.GOLD + "/TCN allow " + ChatColor.AQUA + "Allow a player to join.");
+		    				p.sendMessage(ChatColor.GOLD + "/TCN disallow " + ChatColor.AQUA + "Disallow a player to join.");
 		    				p.sendMessage(ChatColor.GOLD + "/TCN invite " + ChatColor.AQUA + "Invite a player to your nation.");
 		    				p.sendMessage(ChatColor.GOLD + "/TCN kick " + ChatColor.AQUA + "Kick a player from your nation");
 		    				p.sendMessage(ChatColor.GOLD + "/TCN accept " + ChatColor.AQUA + "Accepts an invite.");
-		    				p.sendMessage(ChatColor.GOLD + "/TCN promote " + ChatColor.AQUA + "Promote a player in your nation.");
 		    				p.sendMessage(ChatColor.AQUA +  "---=+=---[" + ChatColor.GOLD + "/TCN help 3" + ChatColor.AQUA + "]---=+=---");
 	    				} else if (args[1].contains("3")) {
 	    					p.sendMessage(ChatColor.AQUA +  "---=+=---[" + ChatColor.GOLD + "Nations help" + ChatColor.AQUA + "]---=+=---");
@@ -925,6 +968,7 @@ public class TCN implements CommandExecutor {
 		    				p.sendMessage(ChatColor.AQUA +  "---=+=---[" + ChatColor.GOLD + "/TCN help 4" + ChatColor.AQUA + "]---=+=---");
 	    				} else if (args[1].contains("4")) {
 	    					p.sendMessage(ChatColor.AQUA +  "---=+=---[" + ChatColor.GOLD + "Nations help" + ChatColor.AQUA + "]---=+=---");
+		    				p.sendMessage(ChatColor.GOLD + "/TCN promote " + ChatColor.AQUA + "Promote a player in your nation.");
 		    				p.sendMessage(ChatColor.GOLD + "/TCN donators " + ChatColor.AQUA + "Shows a list of who donated to your nation.");
 		    				p.sendMessage(ChatColor.GOLD + "/TCN adminpanel " + ChatColor.AQUA + "Admin panel");
 		    				p.sendMessage(ChatColor.GOLD + "/TCN help " + ChatColor.AQUA + "Shows a list of commands.");
