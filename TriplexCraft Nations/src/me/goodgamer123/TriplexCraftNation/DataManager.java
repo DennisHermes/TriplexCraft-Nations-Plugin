@@ -283,6 +283,11 @@ public class DataManager extends JavaPlugin {
 		saveFiles();
 	}
 	
+	static boolean isEnemie(String Nation1, String Nation2) {
+		List<String> Enemies = nationsData.getStringList("Nations." + Nation1 + ".Enemies");
+		return Enemies.contains(Nation2);
+	}
+	
 	static void endWar(String Nation1, String Nation2) {
 		List<String> enemies = nationsData.getStringList("Nations." + Nation1 + ".Enemies");
 		enemies.remove(Nation2);
@@ -309,6 +314,11 @@ public class DataManager extends JavaPlugin {
 		nationsData.set("Nations." + Nation2 + ".Allys", allys);
 
 		saveFiles();
+	}
+	
+	static boolean isAlly(String Nation1, String Nation2) {
+		List<String> allys = nationsData.getStringList("Nations." + Nation1 + ".Allys");
+		return allys.contains(Nation2);
 	}
 	
 	static void endAlly(String Nation1, String Nation2) {
