@@ -66,31 +66,31 @@ public class DataManager extends JavaPlugin {
 		}
 	}
 	
-	static int getPricePerBlock() {
+	public static int getPricePerBlock() {
 		return DataManager.settings.getInt("pricePerBlock");
 	}
 	
-	static int getNationPrice() {
+	public static int getNationPrice() {
 		return DataManager.settings.getInt("nationPrice");
 	}
 	
-	static int getWarPrice() {
+	public static int getWarPrice() {
 		return DataManager.settings.getInt("warPrice");
 	}
 	
-	static void setPricePerBlock(int price) {
+	public static void setPricePerBlock(int price) {
 		if (getPricePerBlock() <= price) DataManager.settings.set("pricePerBlock", price);
 	}
 	
-	static void setNationPrice(int price) {
+	public static void setNationPrice(int price) {
 		if (getNationPrice() <= price) DataManager.settings.set("nationPrice", price);
 	}
 	
-	static void setWarPrice(int price) {
+	public static void setWarPrice(int price) {
 		if (getWarPrice() <= price) DataManager.settings.set("warPrice", price);
 	}
 	
-	static boolean hasNation(UUID uuid) {
+	public static boolean hasNation(UUID uuid) {
 		if (playerData.contains(uuid.toString())) {
 			return true;
 		} else {
@@ -98,15 +98,15 @@ public class DataManager extends JavaPlugin {
 		}
 	}
 	
-	static boolean isFinished(String Nation) {
+	public static boolean isFinished(String Nation) {
 		return nationsData.getBoolean("Nations." + Nation + ".Finished");
 	}
 	
-	static boolean isPublic(String Nation) {
+	public static boolean isPublic(String Nation) {
 		return nationsData.getBoolean("Nations." + Nation + ".Public");
 	}
 	
-	static boolean nationsExists(String Nation) {
+	public static boolean nationsExists(String Nation) {
 		if (nationsData.get("Nations." + Nation) != null) {
 			return true;
 		} else {
@@ -114,12 +114,12 @@ public class DataManager extends JavaPlugin {
 		}
 	}
 	
-	static boolean isAllowed(UUID uuid, String Nation) {
+	public static boolean isAllowed(UUID uuid, String Nation) {
 		List<String> allowed = nationsData.getStringList("Nations." + Nation + ".Allowed");
 		return allowed.contains(uuid.toString());
 	}
 	
-	static String getNation(UUID uuid) {
+	public static String getNation(UUID uuid) {
 		if (hasNation(uuid)) {
 			return playerData.getString(uuid.toString() + ".Nation");
 		} else {
@@ -127,7 +127,7 @@ public class DataManager extends JavaPlugin {
 		}
 	}
 	
-	static int getRole(UUID uuid) {
+	public static int getRole(UUID uuid) {
 		String role = playerData.getString(uuid.toString() + ".Role");
 		if (role != null) {
 			if (role.equals("President")) return 4;
@@ -140,11 +140,11 @@ public class DataManager extends JavaPlugin {
 		}
 	}
 	
-	static String getPresident(String Nation) {
+	public static String getPresident(String Nation) {
 		return nationsData.getString("Nations." + Nation + ".President");
 	}
 	
-	static void setPresident(UUID uuid, String Nation) {
+	public static void setPresident(UUID uuid, String Nation) {
 		removePlayer(uuid, Nation);
 		
 		nationsData.set("Nations." + Nation + ".President", uuid.toString());
@@ -164,7 +164,7 @@ public class DataManager extends JavaPlugin {
 		memberList.addPlayer(uuid);
 	}
 	
-	static void setVicePresident(UUID uuid, String Nation) {
+	public static void setVicePresident(UUID uuid, String Nation) {
 		removePlayer(uuid, Nation);
 		
 		nationsData.set("Nations." + Nation + ".VicePresident", uuid.toString());
@@ -184,7 +184,7 @@ public class DataManager extends JavaPlugin {
 		memberList.addPlayer(uuid);
 	}
 	
-	static void setCounsil(UUID uuid, String Nation) {
+	public static void setCounsil(UUID uuid, String Nation) {
 		removePlayer(uuid, Nation);
 		
 		List<String> counsils = nationsData.getStringList("Nations." + Nation + ".Counsils");
@@ -207,7 +207,7 @@ public class DataManager extends JavaPlugin {
 		memberList.addPlayer(uuid);
 	}
 	
-	static void setBuilder(UUID uuid, String Nation) {
+	public static void setBuilder(UUID uuid, String Nation) {
 		removePlayer(uuid, Nation);
 		
 		List<String> builders = nationsData.getStringList("Nations." + Nation + ".Builders");
@@ -230,7 +230,7 @@ public class DataManager extends JavaPlugin {
 		memberList.addPlayer(uuid);
 	}
 	
-	static void setDonator(UUID uuid, String Nation) {
+	public static void setDonator(UUID uuid, String Nation) {
 		List<String> donators = nationsData.getStringList("Nations." + Nation + ".Donators");
 		if (!donators.contains(uuid.toString())) donators.add(uuid.toString());
 		
@@ -239,7 +239,7 @@ public class DataManager extends JavaPlugin {
 		saveFiles();
 	}
 	
-	static void setMember(UUID uuid, String Nation) {
+	public static void setMember(UUID uuid, String Nation) {
 		List<String> members = nationsData.getStringList("Nations." + Nation + ".Members");
 		if (!members.contains(uuid.toString())) members.add(uuid.toString());
 		
@@ -260,7 +260,7 @@ public class DataManager extends JavaPlugin {
 		memberList.addPlayer(uuid);
 	}
 	
-	static void setAllowed(UUID uuid, String Nation) {
+	public static void setAllowed(UUID uuid, String Nation) {
 		List<String> allowed = nationsData.getStringList("Nations." + Nation + ".Allowed");
 		if (!allowed.contains(uuid.toString())) allowed.add(uuid.toString());
 		
@@ -269,7 +269,7 @@ public class DataManager extends JavaPlugin {
 		saveFiles();
 	}
 	
-	static void setWar(String Nation1, String Nation2) {
+	public static void setWar(String Nation1, String Nation2) {
 		List<String> enemies = nationsData.getStringList("Nations." + Nation1 + ".Enemies");
 		enemies.add(Nation2);
 		
@@ -283,12 +283,12 @@ public class DataManager extends JavaPlugin {
 		saveFiles();
 	}
 	
-	static boolean isEnemie(String Nation1, String Nation2) {
+	public static boolean isEnemie(String Nation1, String Nation2) {
 		List<String> Enemies = nationsData.getStringList("Nations." + Nation1 + ".Enemies");
 		return Enemies.contains(Nation2);
 	}
 	
-	static void endWar(String Nation1, String Nation2) {
+	public static void endWar(String Nation1, String Nation2) {
 		List<String> enemies = nationsData.getStringList("Nations." + Nation1 + ".Enemies");
 		enemies.remove(Nation2);
 		
@@ -302,7 +302,7 @@ public class DataManager extends JavaPlugin {
 		saveFiles();
 	}
 	
-	static void setAlly(String Nation1, String Nation2) {
+	public static void setAlly(String Nation1, String Nation2) {
 		List<String> allys = nationsData.getStringList("Nations." + Nation1 + ".Allys");
 		allys.add(Nation2);
 		
@@ -316,12 +316,12 @@ public class DataManager extends JavaPlugin {
 		saveFiles();
 	}
 	
-	static boolean isAlly(String Nation1, String Nation2) {
+	public static boolean isAlly(String Nation1, String Nation2) {
 		List<String> allys = nationsData.getStringList("Nations." + Nation1 + ".Allys");
 		return allys.contains(Nation2);
 	}
 	
-	static void endAlly(String Nation1, String Nation2) {
+	public static void endAlly(String Nation1, String Nation2) {
 		List<String> allys = nationsData.getStringList("Nations." + Nation1 + ".Allys");
 		allys.remove(Nation2);
 		
@@ -335,7 +335,7 @@ public class DataManager extends JavaPlugin {
 		saveFiles();
 	}
 	
-	static void removePlayer(UUID uuid, String Nation) {
+	public static void removePlayer(UUID uuid, String Nation) {
 		if (getRole(uuid) == 4) {
 			if (DataManager.nationsData.contains("Nations." + Nation + ".VicePresident")) {
 				setPresident(UUID.fromString(nationsData.getString("Nations." + Nation + ".VicePresident")), Nation);
@@ -373,11 +373,11 @@ public class DataManager extends JavaPlugin {
 		saveFiles();
 	}
 	
-	static int getTreasuryAmount(String Nation) {
+	public static int getTreasuryAmount(String Nation) {
 		return nationsData.getInt("Nations." + Nation + ".Treasury");
 	}
 	
-	static void finishNation(String Nation) {
+	public static void finishNation(String Nation) {
 		nationsData.set("Nations." + Nation + ".Finished", true);
 		
 		saveFiles();
@@ -391,13 +391,13 @@ public class DataManager extends JavaPlugin {
 		region.setFlag(Flags.ENTRY, StateFlag.State.ALLOW);
 	}
 	
-	static void addTreasury(String Nation, int Amount) {
+	public static void addTreasury(String Nation, int Amount) {
 		nationsData.set("Nations." + Nation + ".Treasury", nationsData.getInt("Nations." + Nation + ".Treasury") + Amount);
 		
 		saveFiles();
 	}
 	
-	static void createVirtualNation(String Nation, UUID uuid, Location loc) {
+	public static void createVirtualNation(String Nation, UUID uuid, Location loc) {
 		DataManager.nationsData.set("Nations." + Nation + ".Finished", false);
 		DataManager.nationsData.set("Nations." + Nation + ".Location", loc);
 		DataManager.nationsData.set("Nations." + Nation + ".Public", true);
@@ -425,7 +425,7 @@ public class DataManager extends JavaPlugin {
 		}
 	}
 	
-	static UUID getUuid(String name) {
+	public static UUID getUuid(String name) {
 		@SuppressWarnings("deprecation")
 		OfflinePlayer op = Bukkit.getOfflinePlayer(name);
 		if (op.hasPlayedBefore()) {
@@ -436,7 +436,7 @@ public class DataManager extends JavaPlugin {
 		}
 	}
 	
-	static String getName(String uuid) {
+	public static String getName(String uuid) {
         String url = "https://api.mojang.com/user/profiles/"+uuid.replace("-", "")+"/names";
         try {
             @SuppressWarnings("deprecation")
