@@ -651,7 +651,7 @@ public class TCN implements CommandExecutor {
 						    			}
 					    			}
 					    		} else {
-					    			if (DataManager.getNation(p.getUniqueId()) == args[1]) {
+					    			if (DataManager.getNation(p.getUniqueId()) != args[1]) {
 					    				if (DataManager.nationsExists(args[1])) {
 					    					if (!DataManager.isEnemie(DataManager.getNation(p.getUniqueId()), DataManager.getNation(UUID.fromString(DataManager.getPresident(args[1]))))) {
 					    						if (!DataManager.isAlly(DataManager.getNation(p.getUniqueId()), DataManager.getNation(UUID.fromString(DataManager.getPresident(args[1]))))) {
