@@ -651,26 +651,36 @@ public class TCN implements CommandExecutor {
 						    			}
 					    			}
 					    		} else {
-				    				if (DataManager.nationsExists(args[1])) {
-				    					if (!DataManager.isEnemie(DataManager.getNation(p.getUniqueId()), DataManager.getNation(UUID.fromString(DataManager.getPresident(args[1]))))) {
-				    						if (!DataManager.isAlly(DataManager.getNation(p.getUniqueId()), DataManager.getNation(UUID.fromString(DataManager.getPresident(args[1]))))) {
-						    					if (Bukkit.getOfflinePlayer(UUID.fromString(DataManager.getPresident(args[1]))).isOnline()) {
-						    						Bukkit.getPlayer(UUID.fromString(DataManager.getPresident(args[1]))).sendMessage(ChatColor.GOLD + DataManager.getNation(p.getUniqueId()) + ChatColor.AQUA + " has declared war. Use " + ChatColor.GOLD + "/TCN war accept" + ChatColor.AQUA + " or " + ChatColor.GOLD + "/TCN war deny" + ChatColor.AQUA + ".");
-						    					}
-						    					warList.put(DataManager.getNation(UUID.fromString(DataManager.getPresident(args[1]))), DataManager.getNation(p.getUniqueId()));
-						    					p.sendMessage(ChatColor.GREEN + "War request succesfully send to " + ChatColor.DARK_GREEN + args[1]);
-				    						} else {
-				    							p.sendMessage(ChatColor.RED + "§lYou cannot do this!");
-						    		    		p.sendMessage(ChatColor.RED + "You are allies with this nation.");
-				    						}
-				    					} else {
-				    						p.sendMessage(ChatColor.RED + "§lYou cannot do this!");
-					    		    		p.sendMessage(ChatColor.RED + "You are allready in war with this nation.");
-				    					}
-				    				} else {
-				    					p.sendMessage(ChatColor.RED + "§lIncorrect argument!");
-					    	    		p.sendMessage(ChatColor.RED + "Nation does not exist.");
-				    				}
+					    			if (DataManager.getNation(p.getUniqueId()) == args[1]) {
+					    				if (DataManager.nationsExists(args[1])) {
+					    					if (!DataManager.isEnemie(DataManager.getNation(p.getUniqueId()), DataManager.getNation(UUID.fromString(DataManager.getPresident(args[1]))))) {
+					    						if (!DataManager.isAlly(DataManager.getNation(p.getUniqueId()), DataManager.getNation(UUID.fromString(DataManager.getPresident(args[1]))))) {
+					    							if (DataManager.getTreasuryAmount(DataManager.getNation(p.getUniqueId())) >= DataManager.getWarPrice()) {
+								    					if (Bukkit.getOfflinePlayer(UUID.fromString(DataManager.getPresident(args[1]))).isOnline()) {
+								    						Bukkit.getPlayer(UUID.fromString(DataManager.getPresident(args[1]))).sendMessage(ChatColor.GOLD + DataManager.getNation(p.getUniqueId()) + ChatColor.AQUA + " has declared war. Use " + ChatColor.GOLD + "/TCN war accept" + ChatColor.AQUA + " or " + ChatColor.GOLD + "/TCN war deny" + ChatColor.AQUA + ".");
+								    					}
+								    					warList.put(DataManager.getNation(UUID.fromString(DataManager.getPresident(args[1]))), DataManager.getNation(p.getUniqueId()));
+								    					p.sendMessage(ChatColor.GREEN + "War request succesfully send to " + ChatColor.DARK_GREEN + args[1]);
+					    							} else {
+					    								p.sendMessage(ChatColor.RED + "§lYou cannot do this!");
+								    		    		p.sendMessage(ChatColor.RED + "You dont have enough treasury.");
+					    							}
+					    						} else {
+					    							p.sendMessage(ChatColor.RED + "§lYou cannot do this!");
+							    		    		p.sendMessage(ChatColor.RED + "You are allies with this nation.");
+					    						}
+					    					} else {
+					    						p.sendMessage(ChatColor.RED + "§lYou cannot do this!");
+						    		    		p.sendMessage(ChatColor.RED + "You are allready in war with this nation.");
+					    					}
+					    				} else {
+					    					p.sendMessage(ChatColor.RED + "§lIncorrect argument!");
+						    	    		p.sendMessage(ChatColor.RED + "Nation does not exist.");
+					    				}
+					    			} else {
+					    				p.sendMessage(ChatColor.RED + "§lYou cannot do this!");
+				    		    		p.sendMessage(ChatColor.RED + "You cant go in war with your own nation.");
+					    			}
 				    			}
 			    			}
 		    			} else {
